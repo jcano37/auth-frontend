@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 
 /**
  * Hook personalizado para manejar diálogos de confirmación
- * Proporciona una interfaz limpia para mostrar confirmaciones elegantes
+ * Proporciona una interfaz limpia para mostrar confirmaciones
  * @returns {Object} Estado y funciones para manejar confirmaciones
  */
 export const useConfirm = () => {

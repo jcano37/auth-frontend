@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 
 /**
- * Componente Modal reutilizable y elegante
+ * Componente Modal reutilizable
  * @param {Object} props - Propiedades del componente
  * @param {boolean} props.isOpen - Si el modal está abierto
  * @param {Function} props.onClose - Función ejecutada al cerrar

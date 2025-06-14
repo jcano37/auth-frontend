@@ -2,8 +2,7 @@ import React, { useCallback } from 'react';
 import Modal from './Modal';
 
 /**
- * Componente de diálogo de confirmación elegante
- * Reemplaza el feo window.confirm() con un diseño moderno
+ * Componente de diálogo de confirmación
  * @param {Object} props - Propiedades del componente
  * @param {boolean} props.isOpen - Si el diálogo está abierto
  * @param {Function} props.onClose - Función ejecutada al cerrar

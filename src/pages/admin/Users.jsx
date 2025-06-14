@@ -86,7 +86,7 @@ const Users = () => {
   };
 
   /**
-   * Maneja la eliminación de un usuario con confirmación elegante
+   * Maneja la eliminación de un usuario con confirmación
    */
   const handleDelete = async (user) => {
     const confirmed = await confirm({

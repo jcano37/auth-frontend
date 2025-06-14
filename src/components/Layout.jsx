@@ -6,7 +6,7 @@ import { useConfirm } from '../hooks/useConfirm';
 import { ROUTES, MESSAGES } from '../constants';
 
 /**
- * Componente de layout principal de la aplicación
+ * Componente de layout principal
  * Proporciona la estructura base con sidebar y header
  * @param {Object} props - Propiedades del componente
  * @param {React.ReactNode} props.children - Contenido a renderizar
@@ -19,7 +19,7 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
 
   /**
-   * Maneja el proceso de logout con confirmación elegante
+   * Maneja el proceso de logout con confirmación
    */
   const handleLogout = async () => {
     const confirmed = await confirm({
