@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import Layout from '../../components/Layout';
 import { Modal, Table, Alert } from '../../components/ui';
@@ -32,25 +32,25 @@ const Roles = () => {
 
   const { confirmState, confirm, closeConfirm, handleConfirm } = useConfirm();
 
-  useEffect(() => {
-    fetchRoles();
-    fetchPermissions();
-  }, []);
-
-  const fetchRoles = async () => {
+  const fetchRoles = useCallback(async () => {
     await fetchData(() => authService.getRoles(), {
       errorMessage: MESSAGES.ERROR.FETCH
     });
-  };
+  }, [fetchData]);
 
-  const fetchPermissions = async () => {
+  const fetchPermissions = useCallback(async () => {
     try {
       const data = await authService.getPermissions();
       setPermissions(data);
     } catch (err) {
       console.error('Failed to fetch permissions:', err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchRoles();
+    fetchPermissions();
+  }, [fetchRoles, fetchPermissions]);
 
   const onSubmit = async (data) => {
     try {
@@ -70,7 +70,7 @@ const Roles = () => {
       handleCloseModal();
       setSuccess(editingRole ? MESSAGES.SUCCESS.UPDATE : MESSAGES.SUCCESS.CREATE);
       setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
+    } catch {
       // Error is handled by useApi hook
     }
   };
@@ -103,7 +103,7 @@ const Roles = () => {
         removeItem(role.id);
         setSuccess(MESSAGES.SUCCESS.DELETE);
         setTimeout(() => setSuccess(''), 3000);
-      } catch (err) {
+      } catch {
         // Error is handled by useApi hook
       }
     }
@@ -122,7 +122,7 @@ const Roles = () => {
       );
       updateItem(selectedRole.id, updatedRole);
       setSelectedRole(updatedRole);
-    } catch (err) {
+    } catch {
       // Error is handled by useApi hook
     }
   };
@@ -135,7 +135,7 @@ const Roles = () => {
       );
       updateItem(selectedRole.id, updatedRole);
       setSelectedRole(updatedRole);
-    } catch (err) {
+    } catch {
       // Error is handled by useApi hook
     }
   };

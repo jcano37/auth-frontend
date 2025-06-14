@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner, ConfirmDialog } from './ui';
 import { useConfirm } from '../hooks/useConfirm';
 import { ROUTES, MESSAGES } from '../constants';
+import Logo from './Logo';
 
 /**
  * Componente de layout principal
@@ -163,7 +164,7 @@ const Layout = ({ children }) => {
           <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto custom-scrollbar">
             {/* Logo/Título */}
             <div className="flex-shrink-0 flex items-center px-4">
-              <h1 className="text-xl font-bold text-gray-900">Auth System</h1>
+              <Logo size="md" showText={true} />
             </div>
             
             {/* Navegación */}
@@ -178,7 +179,7 @@ const Layout = ({ children }) => {
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto custom-scrollbar">
             {/* Logo/Título */}
             <div className="flex items-center flex-shrink-0 px-4">
-              <h1 className="text-xl font-bold text-gray-900">Auth System</h1>
+              <Logo size="md" showText={true} />
             </div>
             
             {/* Navegación */}

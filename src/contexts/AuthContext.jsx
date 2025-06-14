@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useReducer, useEffect, useRef, useMemo, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import * as authService from '../services/authService';
@@ -130,7 +131,7 @@ export const AuthProvider = ({ children }) => {
                 type: 'LOGIN_SUCCESS',
                 payload: { user, token, refreshToken },
               });
-            } catch (userError) {
+            } catch {
               // Si falla obtener usuario, limpiar tokens
               localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
               localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
@@ -155,14 +156,14 @@ export const AuthProvider = ({ children }) => {
                   refreshToken: newTokens.refresh_token,
                 },
               });
-            } catch (refreshError) {
+            } catch {
               // Fallo en renovación, limpiar tokens
               localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
               localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
               dispatch({ type: 'LOGOUT' });
             }
           }
-        } catch (tokenError) {
+        } catch {
           // Token con formato inválido, limpiar y cerrar sesión
           localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
           localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);

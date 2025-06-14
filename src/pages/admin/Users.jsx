@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import Layout from '../../components/Layout';
 import { Modal, Table, Alert, ConfirmDialog } from '../../components/ui';
@@ -31,18 +31,15 @@ const Users = () => {
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  /**
-   * Obtiene la lista de usuarios del servidor
-   */
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     await fetchData(() => authService.getUsers(), {
       errorMessage: MESSAGES.ERROR.FETCH
     });
-  };
+  }, [fetchData]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   /**
    * Maneja el envío del formulario (crear/editar usuario)
@@ -65,7 +62,7 @@ const Users = () => {
       handleCloseModal();
       setSuccess(editingUser ? MESSAGES.SUCCESS.UPDATE : MESSAGES.SUCCESS.CREATE);
       setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
+    } catch {
       // Error es manejado por useApi hook
     }
   };
@@ -107,7 +104,7 @@ const Users = () => {
         removeItem(user.id);
         setSuccess(MESSAGES.SUCCESS.DELETE);
         setTimeout(() => setSuccess(''), 3000);
-      } catch (err) {
+      } catch {
         // Error es manejado por useApi hook
       }
     }
