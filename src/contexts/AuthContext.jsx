@@ -1,10 +1,13 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef, useMemo, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import * as authService from '../services/authService';
-import { STORAGE_KEYS } from '../constants';
+import { STORAGE_KEYS, MESSAGES } from '../constants';
 
 const AuthContext = createContext();
 
+/**
+ * Estado inicial del contexto de autenticación
+ */
 const initialState = {
   user: null,
   token: null,
@@ -14,6 +17,11 @@ const initialState = {
   error: null,
 };
 
+/**
+ * Reducer para manejar el estado de autenticación
+ * @param {Object} state - Estado actual
+ * @param {Object} action - Acción a ejecutar
+ */
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'LOGIN_START':
@@ -78,14 +86,20 @@ const authReducer = (state, action) => {
   }
 };
 
+/**
+ * Proveedor del contexto de autenticación
+ * Maneja el estado global de autenticación de la aplicación
+ */
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const initializationAttempted = useRef(false);
   const isInitializing = useRef(false);
 
-  // Check for existing token on app load
+  /**
+   * Inicializa la autenticación verificando tokens existentes
+   */
   useEffect(() => {
-    // Prevent multiple initialization attempts
+    // Prevenir múltiples intentos de inicialización
     if (initializationAttempted.current || isInitializing.current) {
       return;
     }
@@ -103,13 +117,13 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
-        // Validate token format before decoding
+        // Validar formato del token antes de decodificar
         try {
           const decodedToken = jwtDecode(token);
           const currentTime = Date.now() / 1000;
 
           if (decodedToken.exp > currentTime) {
-            // Token is still valid, try to get user
+            // Token válido, obtener datos del usuario
             try {
               const user = await authService.getCurrentUser();
               dispatch({
@@ -117,21 +131,20 @@ export const AuthProvider = ({ children }) => {
                 payload: { user, token, refreshToken },
               });
             } catch (userError) {
-              console.warn('AuthContext: Failed to get current user:', userError);
-              // If getCurrentUser fails, clear tokens and set as unauthenticated
+              // Si falla obtener usuario, limpiar tokens
               localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
               localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
               dispatch({ type: 'LOGOUT' });
             }
           } else {
-            // Token is expired, try to refresh
+            // Token expirado, intentar renovar
             try {
               const newTokens = await authService.refreshToken(refreshToken);
               
               localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newTokens.access_token);
               localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newTokens.refresh_token);
               
-              // Try to get user with new token
+              // Obtener usuario con el nuevo token
               const user = await authService.getCurrentUser();
               
               dispatch({
@@ -143,23 +156,21 @@ export const AuthProvider = ({ children }) => {
                 },
               });
             } catch (refreshError) {
-              console.warn('AuthContext: Token refresh failed:', refreshError);
-              // Refresh failed, clear tokens and set as unauthenticated
+              // Fallo en renovación, limpiar tokens
               localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
               localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
               dispatch({ type: 'LOGOUT' });
             }
           }
         } catch (tokenError) {
-          console.warn('AuthContext: Invalid token format:', tokenError);
-          // Invalid token format, clear and logout
+          // Token con formato inválido, limpiar y cerrar sesión
           localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
           localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
           dispatch({ type: 'LOGOUT' });
         }
       } catch (error) {
-        // Any other error during initialization
-        console.error('AuthContext: Auth initialization error:', error);
+        // Error durante la inicialización
+        console.error('Auth initialization error:', error);
         localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
         dispatch({ type: 'LOGOUT' });
@@ -169,26 +180,23 @@ export const AuthProvider = ({ children }) => {
     };
 
     initializeAuth();
-  }, []); // Empty dependency array - only run once
+  }, []); // Solo ejecutar una vez
 
+  /**
+   * Función para iniciar sesión
+   * @param {Object} credentials - Credenciales de usuario
+   */
   const login = useCallback(async (credentials) => {
     dispatch({ type: 'LOGIN_START' });
     try {
       const response = await authService.login(credentials);
-      console.log('Login response:', response);
       
-      // Save tokens to localStorage FIRST
+      // Guardar tokens en localStorage
       localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token);
       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token);
       
-      // Verify tokens were saved
-      const savedToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-      console.log('Token saved to localStorage:', savedToken ? 'Yes' : 'No');
-      console.log('Storage key used:', STORAGE_KEYS.ACCESS_TOKEN);
-      
-      // Now get user data with the saved token
+      // Obtener datos del usuario
       const user = await authService.getCurrentUser();
-      console.log('User data retrieved:', user);
 
       dispatch({
         type: 'LOGIN_SUCCESS',
@@ -199,113 +207,132 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
-      return response;
+      return { user, token: response.access_token };
     } catch (error) {
-      console.error('Login error:', error);
-      // Clear tokens if login fails
-      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+      const errorMessage = error.response?.data?.detail || 
+                          error.message || 
+                          MESSAGES.ERROR.LOGIN;
       
       dispatch({
         type: 'LOGIN_FAILURE',
-        payload: error.response?.data?.detail || 'Login failed',
+        payload: errorMessage,
       });
       throw error;
     }
   }, []);
 
-  const register = useCallback(async (userData) => {
-    dispatch({ type: 'LOGIN_START' });
-    try {
-      const response = await authService.register(userData);
-      dispatch({ type: 'SET_LOADING', payload: false });
-      return response;
-    } catch (error) {
-      dispatch({
-        type: 'LOGIN_FAILURE',
-        payload: error.response?.data?.detail || 'Registration failed',
-      });
-      throw error;
-    }
-  }, []);
-
+  /**
+   * Función para cerrar sesión
+   */
   const logout = useCallback(async () => {
     try {
       await authService.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      // Continuar con el logout local aunque falle el servidor
+      console.warn('Server logout failed:', error);
     } finally {
+      // Limpiar almacenamiento local y estado
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       dispatch({ type: 'LOGOUT' });
     }
   }, []);
 
+  /**
+   * Función para registrar nuevo usuario
+   * @param {Object} userData - Datos del usuario
+   */
+  const register = useCallback(async (userData) => {
+    dispatch({ type: 'LOGIN_START' });
+    try {
+      const response = await authService.register(userData);
+      
+      // Si el registro incluye login automático
+      if (response.access_token) {
+        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token);
+        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token);
+        
+        const user = await authService.getCurrentUser();
+        
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: {
+            user,
+            token: response.access_token,
+            refreshToken: response.refresh_token,
+          },
+        });
+      } else {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+      
+      return response;
+    } catch (error) {
+      const errorMessage = error.response?.data?.detail || 
+                          error.message || 
+                          MESSAGES.ERROR.REGISTER;
+      
+      dispatch({
+        type: 'LOGIN_FAILURE',
+        payload: errorMessage,
+      });
+      throw error;
+    }
+  }, []);
+
+  /**
+   * Función para actualizar datos del usuario
+   * @param {Object} userData - Datos actualizados
+   */
   const updateUser = useCallback(async (userData) => {
     try {
       const updatedUser = await authService.updateCurrentUser(userData);
-      dispatch({ type: 'UPDATE_USER', payload: updatedUser });
+      dispatch({
+        type: 'UPDATE_USER',
+        payload: updatedUser,
+      });
       return updatedUser;
     } catch (error) {
+      const errorMessage = error.response?.data?.detail || 
+                          error.message || 
+                          MESSAGES.ERROR.UPDATE;
+      
       dispatch({
         type: 'SET_ERROR',
-        payload: error.response?.data?.detail || 'Update failed',
+        payload: errorMessage,
       });
       throw error;
     }
   }, []);
 
-  const requestPasswordReset = useCallback(async (email) => {
-    try {
-      return await authService.requestPasswordReset(email);
-    } catch (error) {
-      dispatch({
-        type: 'SET_ERROR',
-        payload: error.response?.data?.detail || 'Password reset request failed',
-      });
-      throw error;
-    }
-  }, []);
-
-  const resetPassword = useCallback(async (token, newPassword) => {
-    try {
-      return await authService.resetPassword(token, newPassword);
-    } catch (error) {
-      dispatch({
-        type: 'SET_ERROR',
-        payload: error.response?.data?.detail || 'Password reset failed',
-      });
-      throw error;
-    }
-  }, []);
-
+  /**
+   * Función para limpiar errores
+   */
   const clearError = useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
 
-  const value = useMemo(() => ({
+  // Memoizar el valor del contexto para optimizar renders
+  const contextValue = useMemo(() => ({
     ...state,
     login,
-    register,
     logout,
-    updateUser,
-    requestPasswordReset,
-    resetPassword,
-    clearError,
-  }), [
-    state,
-    login,
     register,
-    logout,
     updateUser,
-    requestPasswordReset,
-    resetPassword,
     clearError,
-  ]);
+  }), [state, login, logout, register, updateUser, clearError]);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
+/**
+ * Hook para usar el contexto de autenticación
+ * @returns {Object} Estado y funciones de autenticación
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

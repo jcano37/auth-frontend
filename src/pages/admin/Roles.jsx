@@ -5,6 +5,8 @@ import { Modal, Table, Alert } from '../../components/ui';
 import { useApiList, useApi } from '../../hooks/useApi';
 import * as authService from '../../services/authService';
 import { MESSAGES } from '../../constants';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import { useConfirm } from '../../hooks/useConfirm';
 
 const Roles = () => {
   const {
@@ -27,6 +29,8 @@ const Roles = () => {
   const [selectedRole, setSelectedRole] = useState(null);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+  const { confirmState, confirm, closeConfirm, handleConfirm } = useConfirm();
 
   useEffect(() => {
     fetchRoles();
@@ -80,14 +84,23 @@ const Roles = () => {
     setShowCreateModal(true);
   };
 
-  const handleDelete = async (roleId) => {
-    if (window.confirm(MESSAGES.CONFIRM.DELETE)) {
+  const handleDelete = async (role) => {
+    const confirmed = await confirm({
+      title: 'Delete Role',
+      message: `Are you sure you want to delete the role "${role.name}"? This action cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+      icon: '🗑️'
+    });
+
+    if (confirmed) {
       try {
         await execute(
-          () => authService.deleteRole(roleId),
+          () => authService.deleteRole(role.id),
           { successMessage: MESSAGES.SUCCESS.DELETE }
         );
-        removeItem(roleId);
+        removeItem(role.id);
         setSuccess(MESSAGES.SUCCESS.DELETE);
         setTimeout(() => setSuccess(''), 3000);
       } catch (err) {
@@ -197,7 +210,7 @@ const Roles = () => {
             Edit
           </button>
           <button
-            onClick={() => handleDelete(role.id)}
+            onClick={() => handleDelete(role)}
             className="text-red-600 hover:text-red-900 text-sm"
           >
             Delete
@@ -331,6 +344,19 @@ const Roles = () => {
             </div>
           </div>
         </Modal>
+
+        {/* Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={confirmState.isOpen}
+          onClose={closeConfirm}
+          onConfirm={handleConfirm}
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmText={confirmState.confirmText}
+          cancelText={confirmState.cancelText}
+          type={confirmState.type}
+          icon={confirmState.icon}
+        />
       </div>
     </Layout>
   );

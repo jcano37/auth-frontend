@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Layout from '../../components/Layout';
 import { Modal, Table, Alert } from '../../components/ui';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import { useApiList, useApi } from '../../hooks/useApi';
+import { useConfirm } from '../../hooks/useConfirm';
 import * as authService from '../../services/authService';
 import { MESSAGES } from '../../constants';
 
@@ -24,6 +26,7 @@ const Permissions = () => {
   const [success, setSuccess] = useState('');
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const { confirmState, confirm, closeConfirm, handleConfirm } = useConfirm();
 
   useEffect(() => {
     fetchPermissions();
@@ -69,14 +72,23 @@ const Permissions = () => {
     setShowCreateModal(true);
   };
 
-  const handleDelete = async (permissionId) => {
-    if (window.confirm(MESSAGES.CONFIRM.DELETE)) {
+  const handleDelete = async (permission) => {
+    const confirmed = await confirm({
+      title: 'Delete Permission',
+      message: `Are you sure you want to delete the permission "${permission.name}"? This action cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+      icon: '🗑️'
+    });
+
+    if (confirmed) {
       try {
         await execute(
-          () => authService.deletePermission(permissionId),
+          () => authService.deletePermission(permission.id),
           { successMessage: MESSAGES.SUCCESS.DELETE }
         );
-        removeItem(permissionId);
+        removeItem(permission.id);
         setSuccess(MESSAGES.SUCCESS.DELETE);
         setTimeout(() => setSuccess(''), 3000);
       } catch (err) {
@@ -144,7 +156,7 @@ const Permissions = () => {
             Edit
           </button>
           <button
-            onClick={() => handleDelete(permission.id)}
+            onClick={() => handleDelete(permission)}
             className="text-red-600 hover:text-red-900 text-sm"
           >
             Delete
@@ -270,10 +282,12 @@ const Permissions = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-blue-700">
-                    <strong>Tip:</strong> Use a consistent naming convention like "resource:action" 
-                    (e.g., "users:create", "roles:manage") for better organization.
-                  </p>
+                  <h3 className="text-sm font-medium text-blue-800">
+                    Permission Naming Convention
+                  </h3>
+                  <div className="mt-2 text-sm text-blue-700">
+                    <p>Use the format: <code>resource:action</code> (e.g., users:create, roles:delete)</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -292,6 +306,19 @@ const Permissions = () => {
             </div>
           </form>
         </Modal>
+
+        {/* Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={confirmState.isOpen}
+          onClose={closeConfirm}
+          onConfirm={handleConfirm}
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmText={confirmState.confirmText}
+          cancelText={confirmState.cancelText}
+          type={confirmState.type}
+          icon={confirmState.icon}
+        />
       </div>
     </Layout>
   );

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Layout from '../../components/Layout';
-import { Modal, Table, Alert } from '../../components/ui';
+import { Modal, Table, Alert, ConfirmDialog } from '../../components/ui';
 import { useApiList, useApi } from '../../hooks/useApi';
+import { useConfirm } from '../../hooks/useConfirm';
 import * as authService from '../../services/authService';
 import { MESSAGES } from '../../constants';
 
+/**
+ * Página de administración de usuarios
+ * Permite crear, editar, eliminar y listar usuarios
+ */
 const Users = () => {
   const {
     data: users,
@@ -19,6 +24,7 @@ const Users = () => {
   } = useApiList();
 
   const { execute } = useApi();
+  const { confirmState, confirm, closeConfirm, handleConfirm } = useConfirm();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [success, setSuccess] = useState('');
@@ -29,12 +35,18 @@ const Users = () => {
     fetchUsers();
   }, []);
 
+  /**
+   * Obtiene la lista de usuarios del servidor
+   */
   const fetchUsers = async () => {
     await fetchData(() => authService.getUsers(), {
       errorMessage: MESSAGES.ERROR.FETCH
     });
   };
 
+  /**
+   * Maneja el envío del formulario (crear/editar usuario)
+   */
   const onSubmit = async (data) => {
     try {
       if (editingUser) {
@@ -54,10 +66,13 @@ const Users = () => {
       setSuccess(editingUser ? MESSAGES.SUCCESS.UPDATE : MESSAGES.SUCCESS.CREATE);
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      // Error is handled by useApi hook
+      // Error es manejado por useApi hook
     }
   };
 
+  /**
+   * Prepara el formulario para editar un usuario
+   */
   const handleEdit = (user) => {
     setEditingUser(user);
     reset({
@@ -70,22 +85,37 @@ const Users = () => {
     setShowCreateModal(true);
   };
 
-  const handleDelete = async (userId) => {
-    if (window.confirm(MESSAGES.CONFIRM.DELETE)) {
+  /**
+   * Maneja la eliminación de un usuario con confirmación elegante
+   */
+  const handleDelete = async (user) => {
+    const confirmed = await confirm({
+      title: 'Delete User',
+      message: `Are you sure you want to delete "${user.full_name || user.username}"? This action cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+      icon: '🗑️'
+    });
+
+    if (confirmed) {
       try {
         await execute(
-          () => authService.deleteUser(userId),
+          () => authService.deleteUser(user.id),
           { successMessage: MESSAGES.SUCCESS.DELETE }
         );
-        removeItem(userId);
+        removeItem(user.id);
         setSuccess(MESSAGES.SUCCESS.DELETE);
         setTimeout(() => setSuccess(''), 3000);
       } catch (err) {
-        // Error is handled by useApi hook
+        // Error es manejado por useApi hook
       }
     }
   };
 
+  /**
+   * Cierra el modal y resetea el formulario
+   */
   const handleCloseModal = () => {
     setShowCreateModal(false);
     setEditingUser(null);
@@ -100,6 +130,9 @@ const Users = () => {
     });
   };
 
+  /**
+   * Configuración de columnas para la tabla
+   */
   const columns = [
     {
       header: 'User',
@@ -159,13 +192,15 @@ const Users = () => {
         <div className="flex justify-end space-x-2">
           <button
             onClick={() => handleEdit(user)}
-            className="text-primary-600 hover:text-primary-900 text-sm"
+            className="text-primary-600 hover:text-primary-900 text-sm font-medium transition-colors"
+            title="Edit user"
           >
             Edit
           </button>
           <button
-            onClick={() => handleDelete(user.id)}
-            className="text-red-600 hover:text-red-900 text-sm"
+            onClick={() => handleDelete(user)}
+            className="text-red-600 hover:text-red-900 text-sm font-medium transition-colors"
+            title="Delete user"
           >
             Delete
           </button>
@@ -206,91 +241,115 @@ const Users = () => {
           onClose={handleCloseModal}
           title={editingUser ? 'Edit User' : 'Create New User'}
         >
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input
-                      {...register('full_name', { required: 'Full name is required' })}
-                      type="text"
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                    />
-                    {errors.full_name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.full_name.message}</p>
-                    )}
-                  </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="form-label">Full Name</label>
+              <input
+                {...register('full_name', { required: 'Full name is required' })}
+                type="text"
+                className="form-input"
+                placeholder="Enter full name"
+              />
+              {errors.full_name && (
+                <p className="form-error">{errors.full_name.message}</p>
+              )}
+            </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Username</label>
-                    <input
-                      {...register('username', { required: 'Username is required' })}
-                      type="text"
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                    />
-                    {errors.username && (
-                      <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
-                    )}
-                  </div>
+            <div>
+              <label className="form-label">Username</label>
+              <input
+                {...register('username', { required: 'Username is required' })}
+                type="text"
+                className="form-input"
+                placeholder="Enter username"
+              />
+              {errors.username && (
+                <p className="form-error">{errors.username.message}</p>
+              )}
+            </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
-                    <input
-                      {...register('email', { required: 'Email is required' })}
-                      type="email"
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                    />
-                    {errors.email && (
-                      <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-                    )}
-                  </div>
+            <div>
+              <label className="form-label">Email</label>
+              <input
+                {...register('email', { required: 'Email is required' })}
+                type="email"
+                className="form-input"
+                placeholder="Enter email address"
+              />
+              {errors.email && (
+                <p className="form-error">{errors.email.message}</p>
+              )}
+            </div>
 
-                  {!editingUser && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Password</label>
-                      <input
-                        {...register('password', { required: 'Password is required' })}
-                        type="password"
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                      />
-                      {errors.password && (
-                        <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                      )}
-                    </div>
-                  )}
+            {!editingUser && (
+              <div>
+                <label className="form-label">Password</label>
+                <input
+                  {...register('password', { required: 'Password is required' })}
+                  type="password"
+                  className="form-input"
+                  placeholder="Enter password"
+                />
+                {errors.password && (
+                  <p className="form-error">{errors.password.message}</p>
+                )}
+              </div>
+            )}
 
-                  <div className="flex items-center space-x-4">
-                    <label className="flex items-center">
-                      <input
-                        {...register('is_active')}
-                        type="checkbox"
-                        className="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">Active</span>
-                    </label>
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center">
+                <input
+                  {...register('is_active')}
+                  type="checkbox"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                <label className="ml-2 block text-sm text-gray-900">
+                  Active
+                </label>
+              </div>
 
-                    <label className="flex items-center">
-                      <input
-                        {...register('is_superuser')}
-                        type="checkbox"
-                        className="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">Administrator</span>
-                    </label>
-                  </div>
+              <div className="flex items-center">
+                <input
+                  {...register('is_superuser')}
+                  type="checkbox"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                <label className="ml-2 block text-sm text-gray-900">
+                  Administrator
+                </label>
+              </div>
+            </div>
 
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={handleCloseModal}
-                      className="btn-secondary"
-                    >
-                      Cancel
-                    </button>
-                    <button type="submit" className="btn-primary">
-                      {editingUser ? 'Update' : 'Create'}
-                    </button>
-                  </div>
-                </form>
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn-primary"
+              >
+                {editingUser ? 'Update User' : 'Create User'}
+              </button>
+            </div>
+          </form>
         </Modal>
+
+        {/* Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={confirmState.isOpen}
+          onClose={closeConfirm}
+          onConfirm={handleConfirm}
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmText={confirmState.confirmText}
+          cancelText={confirmState.cancelText}
+          type={confirmState.type}
+          icon={confirmState.icon}
+        />
       </div>
     </Layout>
   );

@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import SuspenseFallback from './components/SuspenseFallback';
 
 // Pages
 import Login from './pages/Login';
@@ -49,7 +50,7 @@ function App() {
               path="/admin/users" 
               element={
                 <ProtectedRoute requireAdmin={true}>
-                  <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div></div>}>
+                  <Suspense fallback={<SuspenseFallback />}>
                     <Users />
                   </Suspense>
                 </ProtectedRoute>
@@ -59,7 +60,7 @@ function App() {
               path="/admin/roles" 
               element={
                 <ProtectedRoute requireAdmin={true}>
-                  <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div></div>}>
+                  <Suspense fallback={<SuspenseFallback />}>
                     <Roles />
                   </Suspense>
                 </ProtectedRoute>
@@ -69,7 +70,7 @@ function App() {
               path="/admin/permissions" 
               element={
                 <ProtectedRoute requireAdmin={true}>
-                  <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div></div>}>
+                  <Suspense fallback={<SuspenseFallback />}>
                     <Permissions />
                   </Suspense>
                 </ProtectedRoute>
