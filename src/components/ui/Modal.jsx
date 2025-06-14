@@ -60,14 +60,14 @@ const Modal = ({
 
   return (
     <div 
-      className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4"
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? "modal-title" : undefined}
     >
       <div 
-        className={`relative bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} transform transition-all fade-in`}
+        className={`relative bg-white rounded-lg shadow-2xl border border-gray-200 w-full ${sizeClasses[size]} transform transition-all fade-in`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
