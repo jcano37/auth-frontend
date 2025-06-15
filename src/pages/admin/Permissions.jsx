@@ -24,6 +24,7 @@ const Permissions = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingPermission, setEditingPermission] = useState(null);
   const [success, setSuccess] = useState('');
+  const [resourceTypes, setResourceTypes] = useState([]);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const { confirmState, confirm, closeConfirm, handleConfirm } = useConfirm();
@@ -34,9 +35,19 @@ const Permissions = () => {
     });
   }, [fetchData]);
 
+  const fetchResourceTypes = useCallback(async () => {
+    try {
+      const types = await authService.getResourceTypes();
+      setResourceTypes(types);
+    } catch (error) {
+      console.error('Error fetching resource types:', error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchPermissions();
-  }, [fetchPermissions]);
+    fetchResourceTypes();
+  }, [fetchPermissions, fetchResourceTypes]);
 
   const onSubmit = async (data) => {
     try {
@@ -66,7 +77,7 @@ const Permissions = () => {
     reset({
       name: permission.name,
       description: permission.description,
-      resource: permission.resource,
+      resource_type_id: permission.resource_type_id,
       action: permission.action,
     });
     setShowCreateModal(true);
@@ -104,7 +115,7 @@ const Permissions = () => {
     reset({
       name: '',
       description: '',
-      resource: '',
+      resource_type_id: '',
       action: '',
     });
   };
@@ -176,15 +187,7 @@ const Permissions = () => {
     { value: 'edit', label: 'Edit' },
   ];
 
-  const resourceOptions = [
-    { value: 'users', label: 'Users' },
-    { value: 'roles', label: 'Roles' },
-    { value: 'permissions', label: 'Permissions' },
-    { value: 'dashboard', label: 'Dashboard' },
-    { value: 'profile', label: 'Profile' },
-    { value: 'settings', label: 'Settings' },
-    { value: 'reports', label: 'Reports' },
-  ];
+
 
   return (
     <Layout>
@@ -246,22 +249,25 @@ const Permissions = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Resource</label>
                 <select
-                  {...register('resource')}
+                  {...register('resource_type_id', { required: 'Resource is required' })}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 >
                   <option value="">Select resource</option>
-                  {resourceOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
+                  {resourceTypes.map((resourceType) => (
+                    <option key={resourceType.id} value={resourceType.id}>
+                      {resourceType.name}
                     </option>
                   ))}
                 </select>
+                {errors.resource_type_id && (
+                  <p className="mt-1 text-sm text-red-600">{errors.resource_type_id.message}</p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Action</label>
                 <select
-                  {...register('action')}
+                  {...register('action', { required: 'Action is required' })}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 >
                   <option value="">Select action</option>
@@ -271,6 +277,9 @@ const Permissions = () => {
                     </option>
                   ))}
                 </select>
+                {errors.action && (
+                  <p className="mt-1 text-sm text-red-600">{errors.action.message}</p>
+                )}
               </div>
             </div>
 

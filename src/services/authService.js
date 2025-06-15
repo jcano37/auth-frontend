@@ -360,6 +360,19 @@ export const deletePermission = async (permissionId) => {
   return response.data;
 };
 
+// ==================== ENDPOINTS DE RESOURCE TYPES ====================
+
+/**
+ * Obtener lista de tipos de recursos
+ * @param {number} skip - Número de registros a omitir
+ * @param {number} limit - Límite de registros
+ * @returns {Promise<Array>} Lista de tipos de recursos
+ */
+export const getResourceTypes = async (skip = 0, limit = 100) => {
+  const response = await api.get(`/resources/?skip=${skip}&limit=${limit}`);
+  return response.data;
+};
+
 // ==================== ENDPOINTS DE SESIONES ====================
 
 /**
