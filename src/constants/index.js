@@ -18,12 +18,14 @@ export const ROUTES = {
   // Rutas protegidas
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',
+  MY_SESSIONS: '/my-sessions',
   
   // Rutas de administración
   ADMIN: {
     USERS: '/admin/users',
     ROLES: '/admin/roles',
     PERMISSIONS: '/admin/permissions',
+    SESSIONS: '/admin/sessions',
     RESOURCES: '/admin/resources',
   },
 };

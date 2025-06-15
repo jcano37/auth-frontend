@@ -10,11 +10,13 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import ForgotPassword from './pages/ForgotPassword';
+import MySessions from './pages/MySessions';
 
 // Lazy load admin pages for better performance
 const Users = React.lazy(() => import('./pages/admin/Users'));
 const Roles = React.lazy(() => import('./pages/admin/Roles'));
 const Permissions = React.lazy(() => import('./pages/admin/Permissions'));
+const Sessions = React.lazy(() => import('./pages/admin/Sessions'));
 
 function App() {
   return (
@@ -41,6 +43,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/my-sessions" 
+              element={
+                <ProtectedRoute>
+                  <MySessions />
                 </ProtectedRoute>
               } 
             />
@@ -72,6 +82,16 @@ function App() {
                 <ProtectedRoute requireAdmin={true}>
                   <Suspense fallback={<SuspenseFallback />}>
                     <Permissions />
+                  </Suspense>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/sessions" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <Suspense fallback={<SuspenseFallback />}>
+                    <Sessions />
                   </Suspense>
                 </ProtectedRoute>
               } 

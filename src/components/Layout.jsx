@@ -60,6 +60,12 @@ const Layout = ({ children }) => {
       icon: '👤',
       description: 'Mi perfil'
     },
+    { 
+      name: 'My Sessions', 
+      href: ROUTES.MY_SESSIONS, 
+      icon: '🔐',
+      description: 'Mis sesiones activas'
+    },
     // Rutas de administración solo para superusuarios
     ...(user?.is_superuser ? [
       { 
@@ -71,7 +77,7 @@ const Layout = ({ children }) => {
       { 
         name: 'Roles', 
         href: ROUTES.ADMIN.ROLES, 
-        icon: '🔐',
+        icon: '🔑',
         description: 'Gestión de roles'
       },
       { 
@@ -79,6 +85,12 @@ const Layout = ({ children }) => {
         href: ROUTES.ADMIN.PERMISSIONS, 
         icon: '⚙️',
         description: 'Gestión de permisos'
+      },
+      { 
+        name: 'Active Sessions', 
+        href: ROUTES.ADMIN.SESSIONS, 
+        icon: '🌐',
+        description: 'Sesiones activas del sistema'
       },
     ] : []),
   ];

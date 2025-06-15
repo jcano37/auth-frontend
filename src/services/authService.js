@@ -360,4 +360,64 @@ export const deletePermission = async (permissionId) => {
   return response.data;
 };
 
+// ==================== ENDPOINTS DE SESIONES ====================
+
+/**
+ * Obtener sesiones activas del usuario actual
+ * @returns {Promise<Array>} Lista de sesiones activas
+ */
+export const getCurrentUserSessions = async () => {
+  const response = await api.get('/users/me/sessions');
+  return response.data;
+};
+
+/**
+ * Revocar una sesión específica del usuario actual
+ * @param {number} sessionId - ID de la sesión
+ * @returns {Promise<Object>} Respuesta de revocación
+ */
+export const revokeSession = async (sessionId) => {
+  const response = await api.delete(`/users/me/sessions/${sessionId}`);
+  return response.data;
+};
+
+/**
+ * Revocar todas las sesiones del usuario actual excepto la actual
+ * @returns {Promise<Object>} Respuesta de revocación
+ */
+export const revokeAllSessions = async () => {
+  const response = await api.delete('/users/me/sessions');
+  return response.data;
+};
+
+/**
+ * Obtener estadísticas de usuarios activos (admin)
+ * @returns {Promise<Object>} Estadísticas de usuarios activos
+ */
+export const getActiveUsersStats = async () => {
+  const response = await api.get('/users/active-stats');
+  return response.data;
+};
+
+/**
+ * Obtener todas las sesiones activas (admin)
+ * @param {number} skip - Número de registros a omitir
+ * @param {number} limit - Límite de registros
+ * @returns {Promise<Array>} Lista de sesiones activas
+ */
+export const getActiveSessions = async (skip = 0, limit = 100) => {
+  const response = await api.get(`/users/active-sessions?skip=${skip}&limit=${limit}`);
+  return response.data;
+};
+
+/**
+ * Revocar cualquier sesión (admin)
+ * @param {number} sessionId - ID de la sesión
+ * @returns {Promise<Object>} Respuesta de revocación
+ */
+export const adminRevokeSession = async (sessionId) => {
+  const response = await api.delete(`/users/sessions/${sessionId}`);
+  return response.data;
+};
+
 export default api; 
