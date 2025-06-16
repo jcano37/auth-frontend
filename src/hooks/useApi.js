@@ -90,6 +90,7 @@ export const useApiList = (initialData = []) => {
    * @param {Function} apiCall - Función que realiza la llamada a la API
    * @param {Object} options - Opciones de configuración
    * @param {string} options.errorMessage - Mensaje de error personalizado
+   * @param {Function} options.onSuccess - Callback ejecutado en caso de éxito
    * @returns {Promise} Datos obtenidos de la API
    */
   const fetchData = useCallback(async (apiCall, options = {}) => {
@@ -99,6 +100,10 @@ export const useApiList = (initialData = []) => {
       
       const result = await apiCall();
       setData(result);
+      
+      if (options.onSuccess) {
+        options.onSuccess(result);
+      }
       
       return result;
     } catch (err) {
