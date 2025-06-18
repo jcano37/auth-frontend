@@ -223,7 +223,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Función para cerrar sesión
+   * Function to logout
    */
   const logout = useCallback(async () => {
     try {
@@ -248,7 +248,7 @@ export const AuthProvider = ({ children }) => {
   //   try {
   //     const response = await authService.register(userData);
   //     
-  //     // Si el registro incluye login automático
+  //     // If registration includes automatic login
   //     if (response.access_token) {
   //       localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token);
   //       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token);
@@ -331,7 +331,7 @@ export const AuthProvider = ({ children }) => {
 
 /**
  * Hook para usar el contexto de autenticación
- * @returns {Object} Estado y funciones de autenticación
+ * @returns {Object} Authentication state and functions
  */
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -339,4 +339,4 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}; 
+};

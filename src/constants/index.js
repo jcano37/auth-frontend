@@ -10,7 +10,7 @@ export const API_CONFIG = {
  * Rutas de la aplicación
  */
 export const ROUTES = {
-  // Rutas públicas
+  // Public routes
   LOGIN: '/login',
   FORGOT_PASSWORD: '/forgot-password',
   
@@ -19,7 +19,7 @@ export const ROUTES = {
   PROFILE: '/profile',
   MY_SESSIONS: '/my-sessions',
   
-  // Rutas de administración
+  // Administration routes
   ADMIN: {
     USERS: '/admin/users',
     ROLES: '/admin/roles',
@@ -31,7 +31,7 @@ export const ROUTES = {
 };
 
 /**
- * Mensajes de la aplicación
+ * Application messages
  */
 export const MESSAGES = {
   SUCCESS: {
@@ -69,7 +69,7 @@ export const MESSAGES = {
 };
 
 /**
- * Configuración de paginación
+ * Pagination configuration
  */
 export const PAGINATION = {
   DEFAULT_PAGE_SIZE: 10,
@@ -109,7 +109,7 @@ export const VALIDATION = {
   USERNAME_MAX_LENGTH: 50,
   FULL_NAME_MAX_LENGTH: 100,
   
-  // Mensajes de validación
+  // Validation messages
   MESSAGES: {
     REQUIRED: 'This field is required',
     EMAIL_INVALID: 'Please enter a valid email address',
@@ -144,4 +144,4 @@ export const UI_CONFIG = {
     LG: 1024,
     XL: 1280,
   },
-}; 
+};

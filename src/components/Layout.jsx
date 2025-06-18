@@ -38,7 +38,7 @@ const Layout = ({ children }) => {
         navigate(ROUTES.LOGIN);
       } catch (error) {
         console.error('Logout error:', error);
-        // Forzar navegación incluso si falla el logout del servidor
+        // Force navigation even if server logout fails
         navigate(ROUTES.LOGIN);
       }
     }
@@ -52,19 +52,19 @@ const Layout = ({ children }) => {
       name: 'Dashboard', 
       href: ROUTES.DASHBOARD, 
       icon: '🏠',
-      description: 'Panel principal'
+      description: 'Main dashboard'
     },
     { 
       name: 'Profile', 
       href: ROUTES.PROFILE, 
       icon: '👤',
-      description: 'Mi perfil'
+      description: 'My profile'
     },
     { 
       name: 'My Sessions', 
       href: ROUTES.MY_SESSIONS, 
       icon: '🔐',
-      description: 'Mis sesiones activas'
+      description: 'My active sessions'
     },
     // Admin routes only for superusers
     ...(user?.is_superuser ? [
@@ -78,19 +78,19 @@ const Layout = ({ children }) => {
         name: 'Roles', 
         href: ROUTES.ADMIN.ROLES, 
         icon: '🔑',
-        description: 'Gestión de roles'
+        description: 'Role management'
       },
       { 
         name: 'Permissions', 
         href: ROUTES.ADMIN.PERMISSIONS, 
         icon: '⚙️',
-        description: 'Gestión de permisos'
+        description: 'Permission management'
       },
       { 
         name: 'Active Sessions', 
         href: ROUTES.ADMIN.SESSIONS, 
         icon: '🌐',
-        description: 'Sesiones activas del sistema'
+        description: 'System active sessions'
       },
       // Companies management only for root users
       ...(user?.is_superuser && user?.company_id === 1 ? [
@@ -98,7 +98,7 @@ const Layout = ({ children }) => {
           name: 'Companies', 
           href: ROUTES.ADMIN.COMPANIES, 
           icon: '🏢',
-          description: 'Gestión de empresas'
+          description: 'Company management'
         }
       ] : [])
     ] : []),
@@ -148,7 +148,7 @@ const Layout = ({ children }) => {
     </nav>
   );
 
-  // Mostrar spinner si está cargando
+  // Show spinner if loading
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -233,7 +233,7 @@ const Layout = ({ children }) => {
                 </h2>
               </div>
               
-              {/* Información del usuario y logout */}
+              {/* User information and logout */}
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-700 hidden sm:block">
@@ -286,4 +286,4 @@ const Layout = ({ children }) => {
   );
 };
 
-export default Layout; 
+export default Layout;

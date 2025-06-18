@@ -92,7 +92,7 @@ const Sessions = () => {
   const getDeviceInfo = (deviceInfo) => {
     if (!deviceInfo || deviceInfo === 'Unknown') return 'Unknown Device';
     
-    // Extraer información básica del User-Agent
+    // Extract basic information from User-Agent
     if (deviceInfo.includes('Chrome')) return '🌐 Chrome Browser';
     if (deviceInfo.includes('Firefox')) return '🦊 Firefox Browser';
     if (deviceInfo.includes('Safari')) return '🧭 Safari Browser';
@@ -364,4 +364,4 @@ const Sessions = () => {
   );
 };
 
-export default Sessions; 
+export default Sessions;

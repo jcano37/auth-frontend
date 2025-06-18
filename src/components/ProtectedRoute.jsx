@@ -4,17 +4,17 @@ import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from './ui';
 
 /**
- * Componente para proteger rutas que requieren autenticación
- * @param {Object} props - Propiedades del componente
- * @param {React.ReactNode} props.children - Componentes hijos a renderizar si está autenticado
- * @param {boolean} props.requireAdmin - Si requiere permisos de administrador
- * @param {boolean} props.requireRoot - Si requiere ser usuario de la empresa root
+ * Component to protect routes that require authentication
+ * @param {Object} props - Component properties
+ * @param {React.ReactNode} props.children - Child components to render if authenticated
+ * @param {boolean} props.requireAdmin - If requires administrator permissions
+ * @param {boolean} props.requireRoot - If requires being a root company user
  */
 const ProtectedRoute = ({ children, requireAdmin = false, requireRoot = false }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
 
-  // Mostrar spinner mientras se verifica la autenticación
+  // Show spinner while verifying authentication
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children, requireAdmin = false, requireRoot = false })
     );
   }
 
-  // Redirigir a login si no está autenticado
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
@@ -41,4 +41,4 @@ const ProtectedRoute = ({ children, requireAdmin = false, requireRoot = false })
   return children;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

@@ -1,15 +1,15 @@
 import React from 'react';
 
 /**
- * Componente de alerta reutilizable
- * Muestra mensajes de diferentes tipos con estilos consistentes
- * @param {Object} props - Propiedades del componente
- * @param {string} props.type - Tipo de alerta ('success', 'error', 'warning', 'info')
- * @param {string} props.message - Mensaje a mostrar
- * @param {boolean} props.dismissible - Si la alerta puede ser cerrada
- * @param {Function} props.onClose - Función ejecutada al cerrar la alerta
- * @param {string} props.className - Clases CSS adicionales
- * @param {React.ReactNode} props.children - Contenido personalizado
+ * Reusable alert component
+ * Shows messages of different types with consistent styles
+ * @param {Object} props - Component properties
+ * @param {string} props.type - Alert type ('success', 'error', 'warning', 'info')
+ * @param {string} props.message - Message to display
+ * @param {boolean} props.dismissible - If the alert can be dismissed
+ * @param {Function} props.onClose - Function executed on alert close
+ * @param {string} props.className - Additional CSS classes
+ * @param {React.ReactNode} props.children - Custom content
  */
 const Alert = ({ 
   type = 'info', 
@@ -19,7 +19,7 @@ const Alert = ({
   className = '',
   children 
 }) => {
-  // No renderizar si no hay mensaje ni children
+  // Don't render if there's no message or children
   if (!message && !children) return null;
 
   /**
@@ -131,4 +131,4 @@ const Alert = ({
   );
 };
 
-export default Alert; 
+export default Alert;
