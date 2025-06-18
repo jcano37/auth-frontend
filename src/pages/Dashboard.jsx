@@ -111,59 +111,70 @@ const Dashboard = () => {
         </div>
 
         {/* System Stats for Admins */}
-        {user?.is_superuser && systemStats && (
+        {user?.is_superuser && (
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
                 System Statistics
               </h3>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
-                <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">👥</span>
-                    <div>
-                      <p className="text-sm font-medium text-blue-600">Active Users (24h)</p>
-                      <p className="text-2xl font-bold text-blue-900">{systemStats.active_users_24h}</p>
+              {statsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                  <span className="ml-2 text-gray-600">Loading statistics...</span>
+                </div>
+              ) : systemStats ? (
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">👥</span>
+                      <div>
+                        <p className="text-sm font-medium text-blue-600">Active Users (24h)</p>
+                        <p className="text-2xl font-bold text-blue-900">{systemStats.active_users_24h}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">🔗</span>
+                      <div>
+                        <p className="text-sm font-medium text-green-600">Active Sessions</p>
+                        <p className="text-2xl font-bold text-green-900">{systemStats.total_active_sessions}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">👤</span>
+                      <div>
+                        <p className="text-sm font-medium text-purple-600">Total Users</p>
+                        <p className="text-2xl font-bold text-purple-900">{systemStats.total_users}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">🆕</span>
+                      <div>
+                        <p className="text-sm font-medium text-yellow-600">New Users (7d)</p>
+                        <p className="text-2xl font-bold text-yellow-900">{systemStats.new_users_7d}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 p-4 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">📊</span>
+                      <div>
+                        <p className="text-sm font-medium text-indigo-600">Sessions (24h)</p>
+                        <p className="text-2xl font-bold text-indigo-900">{systemStats.active_sessions_24h}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">🔗</span>
-                    <div>
-                      <p className="text-sm font-medium text-green-600">Active Sessions</p>
-                      <p className="text-2xl font-bold text-green-900">{systemStats.total_active_sessions}</p>
-                    </div>
-                  </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  Failed to load statistics
                 </div>
-                <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">👤</span>
-                    <div>
-                      <p className="text-sm font-medium text-purple-600">Total Users</p>
-                      <p className="text-2xl font-bold text-purple-900">{systemStats.total_users}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">🆕</span>
-                    <div>
-                      <p className="text-sm font-medium text-yellow-600">New Users (7d)</p>
-                      <p className="text-2xl font-bold text-yellow-900">{systemStats.new_users_7d}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">📊</span>
-                    <div>
-                      <p className="text-sm font-medium text-indigo-600">Sessions (24h)</p>
-                      <p className="text-2xl font-bold text-indigo-900">{systemStats.active_sessions_24h}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         )}

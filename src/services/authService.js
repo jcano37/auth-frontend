@@ -64,7 +64,7 @@ api.interceptors.response.use(
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
         
         // Only redirect if we're not on public pages or specific requests
-        const isPublicPage = ['/login', '/register', '/forgot-password'].some(path => 
+        const isPublicPage = ['/login', '/forgot-password'].some(path => 
           window.location.pathname.includes(path)
         );
         const isAuthContextRequest = originalRequest.url.includes('/users/me');
@@ -106,14 +106,14 @@ export const login = async (credentials) => {
 };
 
 /**
- * Register new user
+ * Register new user (DEPRECATED - Only used by admin endpoints now)
  * @param {Object} userData - User data
  * @returns {Promise<Object>} Registration response
  */
-export const register = async (userData) => {
-  const response = await api.post('/auth/register', userData);
-  return response.data;
-};
+// export const register = async (userData) => {
+//   const response = await api.post('/auth/register', userData);
+//   return response.data;
+// };
 
 /**
  * Log out current user
@@ -433,6 +433,60 @@ export const getActiveSessions = async (skip = 0, limit = 100) => {
  */
 export const adminRevokeSession = async (sessionId) => {
   const response = await api.delete(`/users/sessions/${sessionId}`);
+  return response.data;
+};
+
+// ==================== COMPANY ENDPOINTS ====================
+
+/**
+ * Get list of companies (for root users only)
+ * @param {number} skip - Number of records to skip
+ * @param {number} limit - Record limit
+ * @returns {Promise<Array>} List of companies
+ */
+export const getCompanies = async (skip = 0, limit = 100) => {
+  const response = await api.get(`/companies/?skip=${skip}&limit=${limit}`);
+  return response.data;
+};
+
+/**
+ * Get company by ID (root users or own company)
+ * @param {number} companyId - Company ID
+ * @returns {Promise<Object>} Company data
+ */
+export const getCompanyById = async (companyId) => {
+  const response = await api.get(`/companies/${companyId}`);
+  return response.data;
+};
+
+/**
+ * Create new company (root users only)
+ * @param {Object} companyData - Company data
+ * @returns {Promise<Object>} Created company
+ */
+export const createCompany = async (companyData) => {
+  const response = await api.post('/companies/', companyData);
+  return response.data;
+};
+
+/**
+ * Update company by ID (root users only)
+ * @param {number} companyId - Company ID
+ * @param {Object} companyData - Data to update
+ * @returns {Promise<Object>} Updated company
+ */
+export const updateCompany = async (companyId, companyData) => {
+  const response = await api.put(`/companies/${companyId}`, companyData);
+  return response.data;
+};
+
+/**
+ * Delete company by ID (root users only)
+ * @param {number} companyId - Company ID
+ * @returns {Promise<Object>} Deletion response
+ */
+export const deleteCompany = async (companyId) => {
+  const response = await api.delete(`/companies/${companyId}`);
   return response.data;
 };
 

@@ -92,6 +92,15 @@ const Layout = ({ children }) => {
         icon: '🌐',
         description: 'Sesiones activas del sistema'
       },
+      // Companies management only for root users
+      ...(user?.is_superuser && user?.company_id === 1 ? [
+        {
+          name: 'Companies', 
+          href: ROUTES.ADMIN.COMPANIES, 
+          icon: '🏢',
+          description: 'Gestión de empresas'
+        }
+      ] : [])
     ] : []),
   ];
 

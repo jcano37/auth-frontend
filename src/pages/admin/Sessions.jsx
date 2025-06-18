@@ -215,7 +215,14 @@ const Sessions = () => {
         )}
 
         {/* Statistics Cards */}
-        {stats && (
+        {statsLoading ? (
+          <div className="bg-white shadow rounded-lg p-6">
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              <span className="ml-2 text-gray-600">Loading statistics...</span>
+            </div>
+          </div>
+        ) : stats ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
@@ -317,7 +324,7 @@ const Sessions = () => {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Sessions Table */}
         <div className="bg-white shadow rounded-lg">

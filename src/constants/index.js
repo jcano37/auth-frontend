@@ -12,7 +12,6 @@ export const API_CONFIG = {
 export const ROUTES = {
   // Rutas públicas
   LOGIN: '/login',
-  REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
   
   // Rutas protegidas
@@ -27,6 +26,7 @@ export const ROUTES = {
     PERMISSIONS: '/admin/permissions',
     SESSIONS: '/admin/sessions',
     RESOURCES: '/admin/resources',
+    COMPANIES: '/admin/companies',
   },
 };
 
@@ -37,7 +37,6 @@ export const MESSAGES = {
   SUCCESS: {
     LOGIN: 'Login successful',
     LOGOUT: 'Logged out successfully',
-    REGISTER: 'Registration successful',
     UPDATE: 'Updated successfully',
     CREATE: 'Created successfully',
     DELETE: 'Deleted successfully',
@@ -47,7 +46,6 @@ export const MESSAGES = {
   ERROR: {
     LOGIN: 'Login failed',
     LOGOUT: 'Logout failed',
-    REGISTER: 'Registration failed',
     UPDATE: 'Update failed',
     CREATE: 'Creation failed',
     DELETE: 'Deletion failed',

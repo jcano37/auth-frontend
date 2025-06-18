@@ -8,8 +8,9 @@ import { LoadingSpinner } from './ui';
  * @param {Object} props - Propiedades del componente
  * @param {React.ReactNode} props.children - Componentes hijos a renderizar si está autenticado
  * @param {boolean} props.requireAdmin - Si requiere permisos de administrador
+ * @param {boolean} props.requireRoot - Si requiere ser usuario de la empresa root
  */
-const ProtectedRoute = ({ children, requireAdmin = false }) => {
+const ProtectedRoute = ({ children, requireAdmin = false, requireRoot = false }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
 
@@ -29,6 +30,11 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
 
   // Redirigir a dashboard si requiere admin y no es admin
   if (requireAdmin && !user?.is_superuser) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  // Check if root access is required (company id 1 is assumed to be the root company)
+  if (requireRoot && (!user?.is_superuser || user?.company_id !== 1)) {
     return <Navigate to="/dashboard" replace />;
   }
 

@@ -240,46 +240,46 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Function to register a new user
+   * Function to register a new user (DEPRECATED - Registration now handled by admin)
    * @param {Object} userData - User data
    */
-  const register = useCallback(async (userData) => {
-    dispatch({ type: 'LOGIN_START' });
-    try {
-      const response = await authService.register(userData);
-      
-      // Si el registro incluye login automático
-      if (response.access_token) {
-        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token);
-        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token);
-        
-        const user = await authService.getCurrentUser();
-        
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: {
-            user,
-            token: response.access_token,
-            refreshToken: response.refresh_token,
-          },
-        });
-      } else {
-        dispatch({ type: 'SET_LOADING', payload: false });
-      }
-      
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.detail || 
-                          error.message || 
-                          MESSAGES.ERROR.REGISTER;
-      
-      dispatch({
-        type: 'LOGIN_FAILURE',
-        payload: errorMessage,
-      });
-      throw error;
-    }
-  }, []);
+  // const register = useCallback(async (userData) => {
+  //   dispatch({ type: 'LOGIN_START' });
+  //   try {
+  //     const response = await authService.register(userData);
+  //     
+  //     // Si el registro incluye login automático
+  //     if (response.access_token) {
+  //       localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token);
+  //       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token);
+  //       
+  //       const user = await authService.getCurrentUser();
+  //       
+  //       dispatch({
+  //         type: 'LOGIN_SUCCESS',
+  //         payload: {
+  //           user,
+  //           token: response.access_token,
+  //           refreshToken: response.refresh_token,
+  //         },
+  //       });
+  //     } else {
+  //       dispatch({ type: 'SET_LOADING', payload: false });
+  //     }
+  //     
+  //     return response;
+  //   } catch (error) {
+  //     const errorMessage = error.response?.data?.detail || 
+  //                         error.message || 
+  //                         MESSAGES.ERROR.REGISTER;
+  //     
+  //     dispatch({
+  //       type: 'LOGIN_FAILURE',
+  //       payload: errorMessage,
+  //     });
+  //     throw error;
+  //   }
+  // }, []);
 
   /**
    * Function to update user data
@@ -318,10 +318,9 @@ export const AuthProvider = ({ children }) => {
     ...state,
     login,
     logout,
-    register,
     updateUser,
     clearError,
-  }), [state, login, logout, register, updateUser, clearError]);
+  }), [state, login, logout, updateUser, clearError]);
 
   return (
     <AuthContext.Provider value={contextValue}>
