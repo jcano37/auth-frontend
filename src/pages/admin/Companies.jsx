@@ -1,301 +1,393 @@
-import React, { useState, useEffect } from 'react';
-import { Table, LoadingSpinner, Alert, Modal, ConfirmDialog } from '../../components/ui';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import Layout from '../../components/Layout';
+import { Modal, Table, Alert, ConfirmDialog, LoadingSpinner } from '../../components/ui';
+import { useApiList, useApi } from '../../hooks/useApi';
+import { useConfirm } from '../../hooks/useConfirm';
 import * as authService from '../../services/authService';
 import { useAuth } from '../../contexts/AuthContext';
+import { MESSAGES, VALIDATION } from '../../constants';
 
+/**
+ * Companies administration page
+ * Allows creating, editing, deleting, and listing companies
+ * Only accessible by root users
+ */
 const Companies = () => {
-  const { user } = useAuth();
-  const [companies, setCompanies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [currentCompany, setCurrentCompany] = useState(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    is_active: true,
-  });
-  const [deleteDialog, setDeleteDialog] = useState({
-    isOpen: false,
-    company: null,
-  });
+  const {
+    data: companies,
+    loading,
+    error,
+    fetchData,
+    addItem,
+    updateItem,
+    removeItem,
+    clearError
+  } = useApiList();
 
-  // Check if user is from root company
-  const isRootUser = user?.is_superuser && user?.company_id === 1; // Assuming company_id 1 is the root company
+  const { user: currentUser } = useAuth();
+  const { execute } = useApi();
+  const { confirmState, confirm, closeConfirm, handleConfirm } = useConfirm();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingCompany, setEditingCompany] = useState(null);
+  const [success, setSuccess] = useState('');
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+  // Check if current user is from root company
+  const isRootUser = currentUser?.is_superuser && currentUser?.company_id === 1;
+
+  const fetchCompanies = useCallback(async () => {
+    await fetchData(() => authService.getCompanies(), {
+      errorMessage: MESSAGES.ERROR.FETCH
+    });
+  }, [fetchData]);
 
   useEffect(() => {
     fetchCompanies();
-  }, []);
+  }, [fetchCompanies]);
 
-  const fetchCompanies = async () => {
+  /**
+   * Handles form submission (create/edit company)
+   */
+  const onSubmit = async (data) => {
     try {
-      setLoading(true);
-      const data = await authService.getCompanies();
-      setCompanies(data);
-      setError(null);
-    } catch (error) {
-      console.error('Error fetching companies:', error);
-      setError('Failed to load companies. Please try again later.');
-    } finally {
-      setLoading(false);
+      if (editingCompany) {
+        const updatedCompany = await execute(
+          () => authService.updateCompany(editingCompany.id, data),
+          { successMessage: MESSAGES.SUCCESS.UPDATE }
+        );
+        updateItem(editingCompany.id, updatedCompany);
+      } else {
+        const newCompany = await execute(
+          () => authService.createCompany(data),
+          { successMessage: MESSAGES.SUCCESS.CREATE }
+        );
+        addItem(newCompany);
+      }
+      handleCloseModal();
+      setSuccess(editingCompany ? MESSAGES.SUCCESS.UPDATE : MESSAGES.SUCCESS.CREATE);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch {
+      // Error is handled by useApi hook
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+  /**
+   * Prepares the form to edit a company
+   */
+  const handleEdit = (company) => {
+    setEditingCompany(company);
+    reset({
+      name: company.name,
+      description: company.description || '',
+      is_active: company.is_active,
     });
+    setShowCreateModal(true);
   };
 
-  const resetForm = () => {
-    setFormData({
+  /**
+   * Handles company deletion with confirmation
+   */
+  const handleDelete = async (company) => {
+    // Prevent deletion of root company
+    if (company.is_root) {
+      setSuccess('');
+      setTimeout(() => {
+        alert('Cannot delete the root company');
+      }, 100);
+      return;
+    }
+
+    const confirmed = await confirm({
+      title: 'Delete Company',
+      message: `Are you sure you want to delete "${company.name}"? This action cannot be undone and will affect all users in this company.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      type: 'danger',
+      icon: '🗑️'
+    });
+
+    if (confirmed) {
+      try {
+        await execute(
+          () => authService.deleteCompany(company.id),
+          { successMessage: MESSAGES.SUCCESS.DELETE }
+        );
+        removeItem(company.id);
+        setSuccess(MESSAGES.SUCCESS.DELETE);
+        setTimeout(() => setSuccess(''), 3000);
+      } catch {
+        // Error is handled by useApi hook
+      }
+    }
+  };
+
+  /**
+   * Closes the modal and resets the form
+   */
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    setEditingCompany(null);
+    clearError();
+    reset({
       name: '',
       description: '',
       is_active: true,
     });
-    setEditMode(false);
-    setCurrentCompany(null);
   };
 
-  const handleOpenModal = (company = null) => {
-    if (company) {
-      setEditMode(true);
-      setCurrentCompany(company);
-      setFormData({
-        name: company.name,
-        description: company.description || '',
-        is_active: company.is_active,
-      });
-    } else {
-      resetForm();
-      setEditMode(false);
-    }
-    setShowModal(true);
-  };
+  /**
+   * Column configuration for the companies table
+   */
+  const columns = [
+    {
+      header: 'Company',
+      render: (company) => (
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center">
+            <span className="text-white text-sm font-medium">
+              {company.name?.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div className="ml-4">
+            <div className="text-sm font-medium text-gray-900 flex items-center">
+              {company.name}
+              {company.is_root && (
+                <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  Root
+                </span>
+              )}
+            </div>
+            <div className="text-sm text-gray-500">
+              {company.description || 'No description'}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: 'Status',
+      render: (company) => (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          company.is_active 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800'
+        }`}>
+          {company.is_active ? 'Active' : 'Inactive'}
+        </span>
+      ),
+    },
+    {
+      header: 'Created',
+      render: (company) => (
+        <div className="text-sm text-gray-900">
+          {new Date(company.created_at).toLocaleDateString()}
+        </div>
+      ),
+    },
+    {
+      header: 'Actions',
+      className: 'text-right',
+      cellClassName: 'text-right',
+      render: (company) => (
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={() => handleEdit(company)}
+            className="text-indigo-600 hover:text-indigo-900 text-sm font-medium transition-colors"
+            title="Edit company"
+          >
+            Edit
+          </button>
+          {!company.is_root && (
+            <button
+              onClick={() => handleDelete(company)}
+              className="text-red-600 hover:text-red-900 text-sm font-medium transition-colors"
+              title="Delete company"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ];
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    resetForm();
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      if (editMode) {
-        await authService.updateCompany(currentCompany.id, formData);
-      } else {
-        await authService.createCompany(formData);
-      }
-      
-      await fetchCompanies();
-      setShowModal(false);
-      resetForm();
-      setError(null);
-    } catch (error) {
-      console.error('Error saving company:', error);
-      setError(error.response?.data?.detail || 'Failed to save company. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openDeleteDialog = (company) => {
-    setDeleteDialog({
-      isOpen: true,
-      company,
-    });
-  };
-
-  const closeDeleteDialog = () => {
-    setDeleteDialog({
-      isOpen: false,
-      company: null,
-    });
-  };
-
-  const handleDeleteCompany = async () => {
-    if (!deleteDialog.company) return;
-    
-    try {
-      setLoading(true);
-      await authService.deleteCompany(deleteDialog.company.id);
-      await fetchCompanies();
-      closeDeleteDialog();
-      setError(null);
-    } catch (error) {
-      console.error('Error deleting company:', error);
-      setError(error.response?.data?.detail || 'Failed to delete company. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getStatusBadgeClass = (isActive) => {
-    return isActive
-      ? 'bg-green-100 text-green-800 border-green-200'
-      : 'bg-red-100 text-red-800 border-red-200';
-  };
-
-  // Special class for root company
-  const getRootBadgeClass = (isRoot) => {
-    return isRoot
-      ? 'bg-purple-100 text-purple-800 border-purple-200'
-      : '';
-  };
-
+  // Show access denied for non-root users
   if (!isRootUser) {
     return (
-      <div className="container mx-auto p-4">
-        <Alert type="error" message="You do not have permission to access this page." />
-      </div>
+      <Layout>
+        <div className="space-y-6">
+          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <span className="text-red-400 text-xl">🚫</span>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Access Denied
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>You do not have permission to access company management. This feature is only available to root administrators.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Companies Management</h1>
-        <button
-          onClick={() => handleOpenModal()}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+    <Layout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="md:flex md:items-center md:justify-between">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+              Companies Management
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage companies and their settings across the system
+            </p>
+          </div>
+          <div className="mt-4 flex md:mt-0 md:ml-4">
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              ➕ Create Company
+            </button>
+          </div>
+        </div>
+
+        {/* Success Alert */}
+        {success && (
+          <Alert type="success" onClose={() => setSuccess('')}>
+            {success}
+          </Alert>
+        )}
+
+        {/* Companies Table */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+              All Companies
+            </h3>
+            
+            <Table
+              columns={columns}
+              data={companies}
+              loading={loading}
+              error={error}
+              onRetry={() => {
+                clearError();
+                fetchCompanies();
+              }}
+              emptyMessage="No companies found"
+            />
+          </div>
+        </div>
+
+        {/* Create/Edit Modal */}
+        <Modal
+          isOpen={showCreateModal}
+          onClose={handleCloseModal}
+          title={editingCompany ? 'Edit Company' : 'Create New Company'}
         >
-          Create Company
-        </button>
-      </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Company Name */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Company Name *
+              </label>
+              <input
+                {...register('name', { 
+                  required: 'Company name is required',
+                  minLength: {
+                    value: 2,
+                    message: 'Company name must be at least 2 characters'
+                  },
+                  maxLength: {
+                    value: 100,
+                    message: 'Company name cannot exceed 100 characters'
+                  }
+                })}
+                type="text"
+                className="form-input"
+                placeholder="Enter company name"
+              />
+              {errors.name && (
+                <p className="form-error">{errors.name.message}</p>
+              )}
+            </div>
 
-      {error && <Alert type="error" message={error} className="mb-4" />}
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                {...register('description', {
+                  maxLength: {
+                    value: 500,
+                    message: 'Description cannot exceed 500 characters'
+                  }
+                })}
+                rows={3}
+                className="form-input"
+                placeholder="Enter company description (optional)"
+              />
+              {errors.description && (
+                <p className="form-error">{errors.description.message}</p>
+              )}
+            </div>
 
-      {loading && !companies.length ? (
-        <LoadingSpinner />
-      ) : (
-        <Table
-          data={companies}
-          columns={[
-            { header: 'ID', accessor: 'id' },
-            { header: 'Name', accessor: 'name' },
-            { header: 'Description', accessor: 'description' },
-            { 
-              header: 'Status', 
-              accessor: 'is_active',
-              cell: (row) => (
-                <span className={`px-2 py-1 rounded-full text-xs border ${getStatusBadgeClass(row.is_active)}`}>
-                  {row.is_active ? 'Active' : 'Inactive'}
-                </span>
-              )
-            },
-            {
-              header: 'Type',
-              accessor: 'is_root',
-              cell: (row) => (
-                row.is_root && (
-                  <span className={`px-2 py-1 rounded-full text-xs border ${getRootBadgeClass(row.is_root)}`}>
-                    Root
-                  </span>
-                )
-              )
-            },
-            {
-              header: 'Actions',
-              cell: (row) => (
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleOpenModal(row)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Edit
-                  </button>
-                  {!row.is_root && (
-                    <button
-                      onClick={() => openDeleteDialog(row)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      Delete
-                    </button>
-                  )}
-                </div>
-              ),
-            },
-          ]}
-          keyField="id"
-          pagination
-          pageSize={10}
+            {/* Active Status */}
+            <div className="flex items-center">
+              <input
+                {...register('is_active')}
+                type="checkbox"
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              />
+              <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
+                Company is active
+              </label>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn-primary"
+              >
+                {editingCompany ? 'Update Company' : 'Create Company'}
+              </button>
+            </div>
+          </form>
+        </Modal>
+
+        {/* Confirm Dialog */}
+        <ConfirmDialog
+          isOpen={confirmState.isOpen}
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmText={confirmState.confirmText}
+          cancelText={confirmState.cancelText}
+          type={confirmState.type}
+          icon={confirmState.icon}
+          onConfirm={handleConfirm}
+          onClose={closeConfirm}
         />
-      )}
-
-      {/* Company Add/Edit Modal */}
-      <Modal
-        isOpen={showModal}
-        onClose={handleCloseModal}
-        title={editMode ? 'Edit Company' : 'Create New Company'}
-      >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-medium">Name</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium">Description</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded"
-              rows="3"
-            />
-          </div>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="is_active"
-              checked={formData.is_active}
-              onChange={handleInputChange}
-              className="mr-2"
-            />
-            <label>Active</label>
-          </div>
-          
-          <div className="flex justify-end mt-4 gap-2">
-            <button
-              type="button"
-              onClick={handleCloseModal}
-              className="px-4 py-2 border rounded"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              disabled={loading}
-            >
-              {loading ? 'Saving...' : 'Save'}
-            </button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={deleteDialog.isOpen}
-        onClose={closeDeleteDialog}
-        onConfirm={handleDeleteCompany}
-        title="Delete Company"
-        message={`Are you sure you want to delete ${deleteDialog.company?.name}? This action cannot be undone.`}
-        confirmText="Delete"
-        confirmButtonClass="bg-red-600 hover:bg-red-700"
-      />
-    </div>
+      </div>
+    </Layout>
   );
 };
 
