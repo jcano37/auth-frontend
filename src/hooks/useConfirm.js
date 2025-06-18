@@ -1,9 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 
 /**
- * Hook personalizado para manejar diálogos de confirmación
- * Proporciona una interfaz limpia para mostrar confirmaciones
- * @returns {Object} Estado y funciones para manejar confirmaciones
+ * Custom hook to handle confirmation dialogs
+ * Provides a clean interface for showing confirmations
+ * @returns {Object} State and functions to handle confirmations
  */
 export const useConfirm = () => {
   const [confirmState, setConfirmState] = useState({
@@ -16,19 +16,19 @@ export const useConfirm = () => {
     icon: null,
   });
 
-  // Usar useRef para mantener una referencia estable a la función de confirmación
+  // Use useRef to maintain a stable reference to the confirmation function
   const onConfirmRef = useRef(null);
 
   /**
-   * Muestra un diálogo de confirmación
-   * @param {Object} options - Opciones del diálogo
-   * @param {string} options.title - Título del diálogo
-   * @param {string} options.message - Mensaje de confirmación
-   * @param {string} options.confirmText - Texto del botón de confirmación
-   * @param {string} options.cancelText - Texto del botón de cancelar
-   * @param {string} options.type - Tipo de confirmación ('danger', 'warning', 'info')
-   * @param {React.ReactNode} options.icon - Icono personalizado
-   * @returns {Promise<boolean>} Promise que resuelve true si se confirma, false si se cancela
+   * Displays a confirmation dialog
+   * @param {Object} options - Dialog options
+   * @param {string} options.title - Dialog title
+   * @param {string} options.message - Confirmation message
+   * @param {string} options.confirmText - Confirmation button text
+   * @param {string} options.cancelText - Cancel button text
+   * @param {string} options.type - Confirmation type ('danger', 'warning', 'info')
+   * @param {React.ReactNode} options.icon - Custom icon
+   * @returns {Promise<boolean>} Promise that resolves true if confirmed, false if cancelled
    */
   const confirm = useCallback((options = {}) => {
     return new Promise((resolve) => {
@@ -47,19 +47,19 @@ export const useConfirm = () => {
   }, []);
 
   /**
-   * Cierra el diálogo de confirmación
+   * Closes the confirmation dialog
    */
   const closeConfirm = useCallback(() => {
     setConfirmState(prev => ({
       ...prev,
       isOpen: false,
     }));
-    // Limpiar la referencia
+    // Clear the reference
     onConfirmRef.current = null;
   }, []);
 
   /**
-   * Maneja la confirmación
+   * Handles confirmation
    */
   const handleConfirm = useCallback(() => {
     if (onConfirmRef.current) {

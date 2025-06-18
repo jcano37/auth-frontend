@@ -7,7 +7,7 @@ import * as authService from '../services/authService';
 import { MESSAGES } from '../constants';
 
 /**
- * Página para gestionar las sesiones activas del usuario actual
+ * Page to manage active sessions for the current user
  */
 const MySessions = () => {
   const {
@@ -34,7 +34,7 @@ const MySessions = () => {
   }, [fetchSessions]);
 
   /**
-   * Maneja la revocación de una sesión específica
+   * Handles the revocation of a specific session
    */
   const handleRevokeSession = async (session) => {
     const confirmed = await confirm({
@@ -56,13 +56,13 @@ const MySessions = () => {
         setSuccess('Session revoked successfully');
         setTimeout(() => setSuccess(''), 3000);
       } catch {
-        // Error es manejado por useApi hook
+        // Error is handled by useApi hook
       }
     }
   };
 
   /**
-   * Maneja la revocación de todas las sesiones excepto la actual
+   * Handles revoking all sessions except the current one
    */
   const handleRevokeAllSessions = async () => {
     const confirmed = await confirm({
@@ -85,25 +85,25 @@ const MySessions = () => {
         setSuccess('All other sessions revoked successfully');
         setTimeout(() => setSuccess(''), 3000);
       } catch {
-        // Error es manejado por useApi hook
+        // Error is handled by useApi hook
       }
     }
   };
 
   /**
-   * Formatea la fecha de manera legible
+   * Formats the date in a readable way
    */
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString();
   };
 
   /**
-   * Obtiene información del dispositivo de manera más legible
+   * Gets more readable device information
    */
   const getDeviceInfo = (deviceInfo) => {
     if (!deviceInfo || deviceInfo === 'Unknown') return 'Unknown Device';
     
-    // Extraer información básica del User-Agent
+    // Extract basic information from the User-Agent
     if (deviceInfo.includes('Chrome')) return '🌐 Chrome Browser';
     if (deviceInfo.includes('Firefox')) return '🦊 Firefox Browser';
     if (deviceInfo.includes('Safari')) return '🧭 Safari Browser';
@@ -117,18 +117,18 @@ const MySessions = () => {
    * Determina si una sesión es la actual
    */
   const isCurrentSession = (session) => {
-    // Esta es una aproximación - en una implementación real podrías
-    // comparar con el token actual o tener un indicador del servidor
+    // This is an approximation - in a real implementation you could
+    // compare with the current token or have a server indicator
     const now = new Date();
     const sessionCreated = new Date(session.created_at);
     const timeDiff = Math.abs(now - sessionCreated);
     
-    // Si la sesión fue creada en los últimos 5 minutos, probablemente es la actual
+    // If the session was created in the last 5 minutes, it is probably the current one
     return timeDiff < 5 * 60 * 1000;
   };
 
   /**
-   * Configuración de columnas para la tabla de sesiones
+   * Column configuration for the sessions table
    */
   const columns = [
     {

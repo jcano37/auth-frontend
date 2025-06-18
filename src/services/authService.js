@@ -4,7 +4,7 @@ import { API_CONFIG, STORAGE_KEYS } from '../constants';
 const API_BASE_URL = API_CONFIG.BASE_URL;
 
 /**
- * Instancia de Axios configurada para la API
+ * Axios instance configured for the API
  */
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -15,7 +15,7 @@ const api = axios.create({
 });
 
 /**
- * Interceptor de request para agregar token de autenticación
+ * Request interceptor to add authentication token
  */
 api.interceptors.request.use(
   (config) => {
@@ -30,8 +30,11 @@ api.interceptors.request.use(
   }
 );
 
+// Define the token expiration time in milliseconds (1 hour)
+const TOKEN_EXPIRATION_TIME = 3600000;
+
 /**
- * Interceptor de response para manejar renovación de tokens
+ * Response interceptor to handle token renewal
  */
 api.interceptors.response.use(
   (response) => response,
@@ -56,11 +59,11 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
       } catch {
-        // Limpiar tokens si la renovación falla
+        // Clear tokens if renewal fails
         localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
         
-        // Solo redirigir si no estamos en páginas públicas o requests específicos
+        // Only redirect if we're not on public pages or specific requests
         const isPublicPage = ['/login', '/register', '/forgot-password'].some(path => 
           window.location.pathname.includes(path)
         );
@@ -68,7 +71,7 @@ api.interceptors.response.use(
         const isRefreshRequest = originalRequest.url.includes('/auth/refresh');
         
         if (!isPublicPage && !isAuthContextRequest && !isRefreshRequest) {
-          // Pequeño delay para prevenir condiciones de carrera
+          // Small delay to prevent race conditions
           setTimeout(() => {
             window.location.href = '/login';
           }, 100);
@@ -80,14 +83,14 @@ api.interceptors.response.use(
   }
 );
 
-// ==================== ENDPOINTS DE AUTENTICACIÓN ====================
+// ==================== AUTHENTICATION ENDPOINTS ====================
 
 /**
- * Iniciar sesión con credenciales de usuario
- * @param {Object} credentials - Credenciales de login
- * @param {string} credentials.username - Nombre de usuario o email
- * @param {string} credentials.password - Contraseña
- * @returns {Promise<Object>} Respuesta con tokens de acceso
+ * Log in with user credentials
+ * @param {Object} credentials - Login credentials
+ * @param {string} credentials.username - Username or email
+ * @param {string} credentials.password - Password
+ * @returns {Promise<Object>} Response with access tokens
  */
 export const login = async (credentials) => {
   const formData = new FormData();
@@ -103,9 +106,9 @@ export const login = async (credentials) => {
 };
 
 /**
- * Registrar nuevo usuario
- * @param {Object} userData - Datos del usuario
- * @returns {Promise<Object>} Respuesta del registro
+ * Register new user
+ * @param {Object} userData - User data
+ * @returns {Promise<Object>} Registration response
  */
 export const register = async (userData) => {
   const response = await api.post('/auth/register', userData);
@@ -113,8 +116,8 @@ export const register = async (userData) => {
 };
 
 /**
- * Cerrar sesión del usuario actual
- * @returns {Promise<Object>} Respuesta del logout
+ * Log out current user
+ * @returns {Promise<Object>} Logout response
  */
 export const logout = async () => {
   const response = await api.post('/auth/logout');
@@ -122,9 +125,9 @@ export const logout = async () => {
 };
 
 /**
- * Renovar token de acceso usando refresh token
- * @param {string} refreshToken - Token de renovación
- * @returns {Promise<Object>} Nuevos tokens
+ * Renew access token using refresh token
+ * @param {string} refreshToken - Refresh token
+ * @returns {Promise<Object>} New tokens
  */
 export const refreshToken = async (refreshToken) => {
   const response = await api.post('/auth/refresh', {
@@ -134,9 +137,9 @@ export const refreshToken = async (refreshToken) => {
 };
 
 /**
- * Solicitar restablecimiento de contraseña
- * @param {string} email - Email del usuario
- * @returns {Promise<Object>} Respuesta de la solicitud
+ * Request password reset
+ * @param {string} email - User's email
+ * @returns {Promise<Object>} Request response
  */
 export const requestPasswordReset = async (email) => {
   const response = await api.post('/auth/password-reset-request', { email });
@@ -144,10 +147,10 @@ export const requestPasswordReset = async (email) => {
 };
 
 /**
- * Restablecer contraseña con token
- * @param {string} token - Token de restablecimiento
- * @param {string} newPassword - Nueva contraseña
- * @returns {Promise<Object>} Respuesta del restablecimiento
+ * Reset password with token
+ * @param {string} token - Reset token
+ * @param {string} newPassword - New password
+ * @returns {Promise<Object>} Reset response
  */
 export const resetPassword = async (token, newPassword) => {
   const response = await api.post('/auth/password-reset', {
@@ -157,11 +160,11 @@ export const resetPassword = async (token, newPassword) => {
   return response.data;
 };
 
-// ==================== ENDPOINTS DE USUARIOS ====================
+// ==================== USER ENDPOINTS ====================
 
 /**
- * Obtener datos del usuario actual
- * @returns {Promise<Object>} Datos del usuario
+ * Get current user data
+ * @returns {Promise<Object>} User data
  */
 export const getCurrentUser = async () => {
   const response = await api.get('/users/me');
@@ -169,9 +172,9 @@ export const getCurrentUser = async () => {
 };
 
 /**
- * Actualizar datos del usuario actual
- * @param {Object} userData - Datos a actualizar
- * @returns {Promise<Object>} Usuario actualizado
+ * Update current user data
+ * @param {Object} userData - Data to update
+ * @returns {Promise<Object>} Updated user
  */
 export const updateCurrentUser = async (userData) => {
   const response = await api.put('/users/me', userData);
@@ -179,10 +182,10 @@ export const updateCurrentUser = async (userData) => {
 };
 
 /**
- * Obtener lista de usuarios (admin)
- * @param {number} skip - Número de registros a omitir
- * @param {number} limit - Límite de registros
- * @returns {Promise<Array>} Lista de usuarios
+ * Get list of users (admin)
+ * @param {number} skip - Number of records to skip
+ * @param {number} limit - Record limit
+ * @returns {Promise<Array>} List of users
  */
 export const getUsers = async (skip = 0, limit = 100) => {
   const response = await api.get(`/users/?skip=${skip}&limit=${limit}`);
@@ -190,9 +193,9 @@ export const getUsers = async (skip = 0, limit = 100) => {
 };
 
 /**
- * Obtener usuario por ID (admin)
- * @param {number} userId - ID del usuario
- * @returns {Promise<Object>} Datos del usuario
+ * Get user by ID (admin)
+ * @param {number} userId - User ID
+ * @returns {Promise<Object>} User data
  */
 export const getUserById = async (userId) => {
   const response = await api.get(`/users/${userId}`);
@@ -200,9 +203,9 @@ export const getUserById = async (userId) => {
 };
 
 /**
- * Crear nuevo usuario (admin)
- * @param {Object} userData - Datos del usuario
- * @returns {Promise<Object>} Usuario creado
+ * Create new user (admin)
+ * @param {Object} userData - User data
+ * @returns {Promise<Object>} Created user
  */
 export const createUser = async (userData) => {
   const response = await api.post('/users/', userData);
@@ -210,10 +213,10 @@ export const createUser = async (userData) => {
 };
 
 /**
- * Actualizar usuario por ID (admin)
- * @param {number} userId - ID del usuario
- * @param {Object} userData - Datos a actualizar
- * @returns {Promise<Object>} Usuario actualizado
+ * Update user by ID (admin)
+ * @param {number} userId - User ID
+ * @param {Object} userData - Data to update
+ * @returns {Promise<Object>} Updated user
  */
 export const updateUser = async (userId, userData) => {
   const response = await api.put(`/users/${userId}`, userData);
@@ -221,22 +224,22 @@ export const updateUser = async (userId, userData) => {
 };
 
 /**
- * Eliminar usuario por ID (admin)
- * @param {number} userId - ID del usuario
- * @returns {Promise<Object>} Respuesta de eliminación
+ * Delete user by ID (admin)
+ * @param {number} userId - User ID
+ * @returns {Promise<Object>} Deletion response
  */
 export const deleteUser = async (userId) => {
   const response = await api.delete(`/users/${userId}`);
   return response.data;
 };
 
-// ==================== ENDPOINTS DE ROLES ====================
+// ==================== ROLE ENDPOINTS ====================
 
 /**
- * Obtener lista de roles
- * @param {number} skip - Número de registros a omitir
- * @param {number} limit - Límite de registros
- * @returns {Promise<Array>} Lista de roles
+ * Get list of roles
+ * @param {number} skip - Number of records to skip
+ * @param {number} limit - Record limit
+ * @returns {Promise<Array>} List of roles
  */
 export const getRoles = async (skip = 0, limit = 100) => {
   const response = await api.get(`/roles/?skip=${skip}&limit=${limit}`);
@@ -244,9 +247,9 @@ export const getRoles = async (skip = 0, limit = 100) => {
 };
 
 /**
- * Obtener rol por ID
- * @param {number} roleId - ID del rol
- * @returns {Promise<Object>} Datos del rol
+ * Get role by ID
+ * @param {number} roleId - Role ID
+ * @returns {Promise<Object>} Role data
  */
 export const getRoleById = async (roleId) => {
   const response = await api.get(`/roles/${roleId}`);
@@ -254,9 +257,9 @@ export const getRoleById = async (roleId) => {
 };
 
 /**
- * Crear nuevo rol
- * @param {Object} roleData - Datos del rol
- * @returns {Promise<Object>} Rol creado
+ * Create new role
+ * @param {Object} roleData - Role data
+ * @returns {Promise<Object>} Created role
  */
 export const createRole = async (roleData) => {
   const response = await api.post('/roles/', roleData);
@@ -264,10 +267,10 @@ export const createRole = async (roleData) => {
 };
 
 /**
- * Actualizar rol por ID
- * @param {number} roleId - ID del rol
- * @param {Object} roleData - Datos a actualizar
- * @returns {Promise<Object>} Rol actualizado
+ * Update role by ID
+ * @param {number} roleId - Role ID
+ * @param {Object} roleData - Data to update
+ * @returns {Promise<Object>} Updated role
  */
 export const updateRole = async (roleId, roleData) => {
   const response = await api.put(`/roles/${roleId}`, roleData);
@@ -275,9 +278,9 @@ export const updateRole = async (roleId, roleData) => {
 };
 
 /**
- * Eliminar rol por ID
- * @param {number} roleId - ID del rol
- * @returns {Promise<Object>} Respuesta de eliminación
+ * Delete role by ID
+ * @param {number} roleId - Role ID
+ * @returns {Promise<Object>} Deletion response
  */
 export const deleteRole = async (roleId) => {
   const response = await api.delete(`/roles/${roleId}`);
@@ -285,10 +288,10 @@ export const deleteRole = async (roleId) => {
 };
 
 /**
- * Asignar permiso a rol
- * @param {number} roleId - ID del rol
- * @param {number} permissionId - ID del permiso
- * @returns {Promise<Object>} Respuesta de asignación
+ * Assign permission to role
+ * @param {number} roleId - Role ID
+ * @param {number} permissionId - Permission ID
+ * @returns {Promise<Object>} Assignment response
  */
 export const assignPermissionToRole = async (roleId, permissionId) => {
   const response = await api.post(`/roles/${roleId}/permissions/${permissionId}`);
@@ -296,23 +299,23 @@ export const assignPermissionToRole = async (roleId, permissionId) => {
 };
 
 /**
- * Remover permiso de rol
- * @param {number} roleId - ID del rol
- * @param {number} permissionId - ID del permiso
- * @returns {Promise<Object>} Respuesta de remoción
+ * Remove permission from role
+ * @param {number} roleId - Role ID
+ * @param {number} permissionId - Permission ID
+ * @returns {Promise<Object>} Removal response
  */
 export const removePermissionFromRole = async (roleId, permissionId) => {
   const response = await api.delete(`/roles/${roleId}/permissions/${permissionId}`);
   return response.data;
 };
 
-// ==================== ENDPOINTS DE PERMISOS ====================
+// ==================== PERMISSION ENDPOINTS ====================
 
 /**
- * Obtener lista de permisos
- * @param {number} skip - Número de registros a omitir
- * @param {number} limit - Límite de registros
- * @returns {Promise<Array>} Lista de permisos
+ * Get list of permissions
+ * @param {number} skip - Number of records to skip
+ * @param {number} limit - Record limit
+ * @returns {Promise<Array>} List of permissions
  */
 export const getPermissions = async (skip = 0, limit = 100) => {
   const response = await api.get(`/permissions/?skip=${skip}&limit=${limit}`);
@@ -320,9 +323,9 @@ export const getPermissions = async (skip = 0, limit = 100) => {
 };
 
 /**
- * Obtener permiso por ID
- * @param {number} permissionId - ID del permiso
- * @returns {Promise<Object>} Datos del permiso
+ * Get permission by ID
+ * @param {number} permissionId - Permission ID
+ * @returns {Promise<Object>} Permission data
  */
 export const getPermissionById = async (permissionId) => {
   const response = await api.get(`/permissions/${permissionId}`);
@@ -330,9 +333,9 @@ export const getPermissionById = async (permissionId) => {
 };
 
 /**
- * Crear nuevo permiso
- * @param {Object} permissionData - Datos del permiso
- * @returns {Promise<Object>} Permiso creado
+ * Create new permission
+ * @param {Object} permissionData - Permission data
+ * @returns {Promise<Object>} Created permission
  */
 export const createPermission = async (permissionData) => {
   const response = await api.post('/permissions/', permissionData);
@@ -340,10 +343,10 @@ export const createPermission = async (permissionData) => {
 };
 
 /**
- * Actualizar permiso por ID
- * @param {number} permissionId - ID del permiso
- * @param {Object} permissionData - Datos a actualizar
- * @returns {Promise<Object>} Permiso actualizado
+ * Update permission by ID
+ * @param {number} permissionId - Permission ID
+ * @param {Object} permissionData - Data to update
+ * @returns {Promise<Object>} Updated permission
  */
 export const updatePermission = async (permissionId, permissionData) => {
   const response = await api.put(`/permissions/${permissionId}`, permissionData);
@@ -351,33 +354,33 @@ export const updatePermission = async (permissionId, permissionData) => {
 };
 
 /**
- * Eliminar permiso por ID
- * @param {number} permissionId - ID del permiso
- * @returns {Promise<Object>} Respuesta de eliminación
+ * Delete permission by ID
+ * @param {number} permissionId - Permission ID
+ * @returns {Promise<Object>} Deletion response
  */
 export const deletePermission = async (permissionId) => {
   const response = await api.delete(`/permissions/${permissionId}`);
   return response.data;
 };
 
-// ==================== ENDPOINTS DE RESOURCE TYPES ====================
+// ==================== RESOURCE TYPE ENDPOINTS ====================
 
 /**
- * Obtener lista de tipos de recursos
- * @param {number} skip - Número de registros a omitir
- * @param {number} limit - Límite de registros
- * @returns {Promise<Array>} Lista de tipos de recursos
+ * Get all resource types
+ * @param {number} skip - Number of records to skip
+ * @param {number} limit - Record limit
+ * @returns {Promise<Array>} List of resource types
  */
 export const getResourceTypes = async (skip = 0, limit = 100) => {
   const response = await api.get(`/resources/?skip=${skip}&limit=${limit}`);
   return response.data;
 };
 
-// ==================== ENDPOINTS DE SESIONES ====================
+// ==================== SESSION ENDPOINTS ====================
 
 /**
- * Obtener sesiones activas del usuario actual
- * @returns {Promise<Array>} Lista de sesiones activas
+ * Get all sessions for the current user
+ * @returns {Promise<Array>} List of active sessions
  */
 export const getCurrentUserSessions = async () => {
   const response = await api.get('/users/me/sessions');
@@ -385,9 +388,9 @@ export const getCurrentUserSessions = async () => {
 };
 
 /**
- * Revocar una sesión específica del usuario actual
- * @param {number} sessionId - ID de la sesión
- * @returns {Promise<Object>} Respuesta de revocación
+ * Revoke a specific session
+ * @param {number} sessionId - Session ID
+ * @returns {Promise<Object>} Revocation response
  */
 export const revokeSession = async (sessionId) => {
   const response = await api.delete(`/users/me/sessions/${sessionId}`);
@@ -395,8 +398,8 @@ export const revokeSession = async (sessionId) => {
 };
 
 /**
- * Revocar todas las sesiones del usuario actual excepto la actual
- * @returns {Promise<Object>} Respuesta de revocación
+ * Revoke all sessions except the current one
+ * @returns {Promise<Object>} Revocation response
  */
 export const revokeAllSessions = async () => {
   const response = await api.delete('/users/me/sessions');
@@ -404,8 +407,8 @@ export const revokeAllSessions = async () => {
 };
 
 /**
- * Obtener estadísticas de usuarios activos (admin)
- * @returns {Promise<Object>} Estadísticas de usuarios activos
+ * Get active users statistics (admin)
+ * @returns {Promise<Object>} Active users statistics
  */
 export const getActiveUsersStats = async () => {
   const response = await api.get('/users/active-stats');
@@ -413,10 +416,10 @@ export const getActiveUsersStats = async () => {
 };
 
 /**
- * Obtener todas las sesiones activas (admin)
- * @param {number} skip - Número de registros a omitir
- * @param {number} limit - Límite de registros
- * @returns {Promise<Array>} Lista de sesiones activas
+ * Get all active sessions (admin)
+ * @param {number} skip - Number of records to skip
+ * @param {number} limit - Record limit
+ * @returns {Promise<Array>} List of active sessions
  */
 export const getActiveSessions = async (skip = 0, limit = 100) => {
   const response = await api.get(`/users/active-sessions?skip=${skip}&limit=${limit}`);
@@ -424,9 +427,9 @@ export const getActiveSessions = async (skip = 0, limit = 100) => {
 };
 
 /**
- * Revocar cualquier sesión (admin)
- * @param {number} sessionId - ID de la sesión
- * @returns {Promise<Object>} Respuesta de revocación
+ * Revoke any session (admin)
+ * @param {number} sessionId - Session ID
+ * @returns {Promise<Object>} Revocation response
  */
 export const adminRevokeSession = async (sessionId) => {
   const response = await api.delete(`/users/sessions/${sessionId}`);

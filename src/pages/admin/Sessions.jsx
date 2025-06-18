@@ -7,7 +7,7 @@ import * as authService from '../../services/authService';
 import { MESSAGES } from '../../constants';
 
 /**
- * Página de administración de sesiones activas
+ * Active sessions administration page
  * Permite ver estadísticas del sistema y gestionar sesiones activas
  */
 const Sessions = () => {
@@ -50,7 +50,7 @@ const Sessions = () => {
   }, [fetchSessions, fetchStats]);
 
   /**
-   * Maneja la revocación de una sesión con confirmación
+   * Handles session revocation with confirmation
    */
   const handleRevokeSession = async (session) => {
     const confirmed = await confirm({
@@ -80,14 +80,14 @@ const Sessions = () => {
   };
 
   /**
-   * Formatea la fecha de manera legible
+   * Formats the date in a readable way
    */
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString();
   };
 
   /**
-   * Obtiene información del dispositivo de manera más legible
+   * Gets device information in a more readable way
    */
   const getDeviceInfo = (deviceInfo) => {
     if (!deviceInfo || deviceInfo === 'Unknown') return 'Unknown Device';
@@ -103,7 +103,7 @@ const Sessions = () => {
   };
 
   /**
-   * Configuración de columnas para la tabla de sesiones
+   * Column configuration for the sessions table
    */
   const columns = [
     {

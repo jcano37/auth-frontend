@@ -7,8 +7,8 @@ import { VALIDATION } from '../constants';
 import Logo from '../components/Logo';
 
 /**
- * Página de inicio de sesión
- * Maneja la autenticación de usuarios y redirección
+ * Login page
+ * Handles user authentication and redirection
  */
 const Login = () => {
   const { 
@@ -21,30 +21,30 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Ruta de redirección después del login
+  // Redirect path after login
   const from = location.state?.from?.pathname || '/dashboard';
 
-  // Redirigir si ya está autenticado
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]);
 
-  // Limpiar errores al montar el componente
+  // Clear errors when component mounts
   useEffect(() => {
     clearError();
   }, [clearError]);
 
   /**
-   * Maneja el envío del formulario de login
-   * @param {Object} data - Datos del formulario
+   * Handles login form submission
+   * @param {Object} data - Form data
    */
   const onSubmit = async (data) => {
     try {
       await login(data);
     } catch (error) {
-      // El error es manejado por el contexto
+      // Error is handled by the context
       console.error('Login error:', error);
     }
   };

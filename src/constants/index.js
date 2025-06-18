@@ -80,7 +80,7 @@ export const PAGINATION = {
 };
 
 /**
- * Roles de usuario
+ * User roles
  */
 export const USER_ROLES = {
   ADMIN: 'admin',
@@ -89,7 +89,7 @@ export const USER_ROLES = {
 };
 
 /**
- * Estados de usuario/recursos
+ * User/resource states
  */
 export const STATUS = {
   ACTIVE: 'active',

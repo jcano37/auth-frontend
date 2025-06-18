@@ -3,7 +3,7 @@ import { MESSAGES } from '../constants';
 
 /**
  * Hook personalizado para manejar llamadas a la API
- * Proporciona estado de carga, errores y función de ejecución
+ * Provides loading state, errors, and execution function
  * @returns {Object} Estado y funciones para manejar API calls
  */
 export const useApi = () => {
@@ -11,15 +11,15 @@ export const useApi = () => {
   const [error, setError] = useState(null);
 
   /**
-   * Ejecuta una llamada a la API con manejo de estado
+   * Executes an API call with state management
    * @param {Function} apiCall - Función que realiza la llamada a la API
-   * @param {Object} options - Opciones de configuración
-   * @param {Function} options.onSuccess - Callback ejecutado en caso de éxito
-   * @param {Function} options.onError - Callback ejecutado en caso de error
-   * @param {string} options.successMessage - Mensaje de éxito a mostrar
-   * @param {string} options.errorMessage - Mensaje de error personalizado
-   * @param {boolean} options.showLoading - Si mostrar estado de carga
-   * @returns {Promise} Resultado de la llamada a la API
+   * @param {Object} options - Configuration options
+   * @param {Function} options.onSuccess - Callback executed on success
+   * @param {Function} options.onError - Callback executed on error
+   * @param {string} options.successMessage - Success message to display
+   * @param {string} options.errorMessage - Custom error message
+   * @param {boolean} options.showLoading - Whether to show loading state
+   * @returns {Promise} Result of the API call
    */
   const execute = useCallback(async (apiCall, options = {}) => {
     const { 
@@ -38,7 +38,7 @@ export const useApi = () => {
       
       if (onSuccess) onSuccess(result);
       if (successMessage) {
-        // Aquí se podría integrar con un sistema de notificaciones toast
+        // A toast notification system could be integrated here
         console.log(successMessage);
       }
       
@@ -60,7 +60,7 @@ export const useApi = () => {
   }, []);
 
   /**
-   * Limpia el estado de error
+   * Clears the error state
    */
   const clearError = useCallback(() => {
     setError(null);
@@ -75,9 +75,9 @@ export const useApi = () => {
 };
 
 /**
- * Hook personalizado para manejar listas de datos de la API
+ * Custom hook to handle API data lists
  * Proporciona funciones CRUD básicas para listas
- * @param {Array} initialData - Datos iniciales de la lista
+ * @param {Array} initialData - Initial list data
  * @returns {Object} Estado y funciones para manejar listas
  */
 export const useApiList = (initialData = []) => {
@@ -86,12 +86,12 @@ export const useApiList = (initialData = []) => {
   const [error, setError] = useState(null);
 
   /**
-   * Obtiene datos de la API y actualiza el estado
+   * Fetches data from the API and updates the state
    * @param {Function} apiCall - Función que realiza la llamada a la API
-   * @param {Object} options - Opciones de configuración
-   * @param {string} options.errorMessage - Mensaje de error personalizado
-   * @param {Function} options.onSuccess - Callback ejecutado en caso de éxito
-   * @returns {Promise} Datos obtenidos de la API
+   * @param {Object} options - Configuration options
+   * @param {string} options.errorMessage - Custom error message
+   * @param {Function} options.onSuccess - Callback executed on success
+   * @returns {Promise} Data obtained from the API
    */
   const fetchData = useCallback(async (apiCall, options = {}) => {
     try {
@@ -138,7 +138,7 @@ export const useApiList = (initialData = []) => {
   }, []);
 
   /**
-   * Remueve un elemento de la lista por ID
+   * Removes an item from the list by ID
    * @param {number|string} id - ID del elemento a remover
    */
   const removeItem = useCallback((id) => {
@@ -146,14 +146,14 @@ export const useApiList = (initialData = []) => {
   }, []);
 
   /**
-   * Limpia el estado de error
+   * Clears the error state
    */
   const clearError = useCallback(() => {
     setError(null);
   }, []);
 
   /**
-   * Reemplaza completamente los datos de la lista
+   * Completely replaces the list data
    * @param {Array} newData - Nuevos datos para la lista
    */
   const replaceData = useCallback((newData) => {
@@ -161,7 +161,7 @@ export const useApiList = (initialData = []) => {
   }, []);
 
   /**
-   * Limpia la lista de datos
+   * Clears the data list
    */
   const clearData = useCallback(() => {
     setData([]);

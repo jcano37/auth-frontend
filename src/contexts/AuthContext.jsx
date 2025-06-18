@@ -7,7 +7,7 @@ import { STORAGE_KEYS, MESSAGES } from '../constants';
 const AuthContext = createContext();
 
 /**
- * Estado inicial del contexto de autenticación
+ * Initial state of the authentication context
  */
 const initialState = {
   user: null,
@@ -19,7 +19,7 @@ const initialState = {
 };
 
 /**
- * Reducer para manejar el estado de autenticación
+ * Reducer to manage authentication state
  * @param {Object} state - Estado actual
  * @param {Object} action - Acción a ejecutar
  */
@@ -88,8 +88,8 @@ const authReducer = (state, action) => {
 };
 
 /**
- * Proveedor del contexto de autenticación
- * Maneja el estado global de autenticación de la aplicación
+ * Authentication context provider
+ * Manages the application's global authentication state
  */
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
    * Inicializa la autenticación verificando tokens existentes
    */
   useEffect(() => {
-    // Prevenir múltiples intentos de inicialización
+    // Prevent multiple initialization attempts
     if (initializationAttempted.current || isInitializing.current) {
       return;
     }
@@ -118,13 +118,13 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
-        // Validar formato del token antes de decodificar
+        // Validate token format before decoding
         try {
           const decodedToken = jwtDecode(token);
           const currentTime = Date.now() / 1000;
 
           if (decodedToken.exp > currentTime) {
-            // Token válido, obtener datos del usuario
+            // Valid token, get user data
             try {
               const user = await authService.getCurrentUser();
               dispatch({
@@ -132,20 +132,20 @@ export const AuthProvider = ({ children }) => {
                 payload: { user, token, refreshToken },
               });
             } catch {
-              // Si falla obtener usuario, limpiar tokens
+              // If user fetch fails, clear tokens
               localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
               localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
               dispatch({ type: 'LOGOUT' });
             }
           } else {
-            // Token expirado, intentar renovar
+            // Expired token, try to renew
             try {
               const newTokens = await authService.refreshToken(refreshToken);
               
               localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newTokens.access_token);
               localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newTokens.refresh_token);
               
-              // Obtener usuario con el nuevo token
+              // Get user with the new token
               const user = await authService.getCurrentUser();
               
               dispatch({
@@ -157,20 +157,20 @@ export const AuthProvider = ({ children }) => {
                 },
               });
             } catch {
-              // Fallo en renovación, limpiar tokens
+              // Renewal failed, clear tokens
               localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
               localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
               dispatch({ type: 'LOGOUT' });
             }
           }
         } catch {
-          // Token con formato inválido, limpiar y cerrar sesión
+          // Invalid token format, clear and logout
           localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
           localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
           dispatch({ type: 'LOGOUT' });
         }
       } catch (error) {
-        // Error durante la inicialización
+        // Error during initialization
         console.error('Auth initialization error:', error);
         localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
@@ -181,22 +181,22 @@ export const AuthProvider = ({ children }) => {
     };
 
     initializeAuth();
-  }, []); // Solo ejecutar una vez
+  }, []); // Only run once
 
   /**
    * Función para iniciar sesión
-   * @param {Object} credentials - Credenciales de usuario
+   * @param {Object} credentials - User credentials
    */
   const login = useCallback(async (credentials) => {
     dispatch({ type: 'LOGIN_START' });
     try {
       const response = await authService.login(credentials);
       
-      // Guardar tokens en localStorage
+      // Save tokens to localStorage
       localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token);
       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token);
       
-      // Obtener datos del usuario
+      // Get user data
       const user = await authService.getCurrentUser();
 
       dispatch({
@@ -229,7 +229,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
     } catch (error) {
-      // Continuar con el logout local aunque falle el servidor
+      // Continue with local logout even if server fails
       console.warn('Server logout failed:', error);
     } finally {
       // Limpiar almacenamiento local y estado
@@ -240,8 +240,8 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Función para registrar nuevo usuario
-   * @param {Object} userData - Datos del usuario
+   * Function to register a new user
+   * @param {Object} userData - User data
    */
   const register = useCallback(async (userData) => {
     dispatch({ type: 'LOGIN_START' });
@@ -282,7 +282,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Función para actualizar datos del usuario
+   * Function to update user data
    * @param {Object} userData - Datos actualizados
    */
   const updateUser = useCallback(async (userData) => {

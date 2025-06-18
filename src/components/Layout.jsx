@@ -45,7 +45,7 @@ const Layout = ({ children }) => {
   };
 
   /**
-   * Configuración de navegación basada en permisos del usuario
+   * Navigation configuration based on user permissions
    */
   const navigation = [
     { 
@@ -66,13 +66,13 @@ const Layout = ({ children }) => {
       icon: '🔐',
       description: 'Mis sesiones activas'
     },
-    // Rutas de administración solo para superusuarios
+    // Admin routes only for superusers
     ...(user?.is_superuser ? [
       { 
         name: 'Users', 
         href: ROUTES.ADMIN.USERS, 
         icon: '👥',
-        description: 'Gestión de usuarios'
+        description: 'User management'
       },
       { 
         name: 'Roles', 
@@ -104,7 +104,7 @@ const Layout = ({ children }) => {
   };
 
   /**
-   * Obtiene las iniciales del usuario para el avatar
+   * Gets the user's initials for the avatar
    */
   const getUserInitials = () => {
     const name = user?.full_name || user?.username || 'U';

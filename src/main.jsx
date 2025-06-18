@@ -4,7 +4,7 @@ import './index.css'
 import App from './App.jsx'
 
 /**
- * Punto de entrada principal de la aplicación React
+ * Main entry point of the React application
  * Configura el renderizado con StrictMode
  */
 createRoot(document.getElementById('root')).render(

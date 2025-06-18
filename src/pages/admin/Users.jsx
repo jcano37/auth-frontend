@@ -8,8 +8,8 @@ import * as authService from '../../services/authService';
 import { MESSAGES } from '../../constants';
 
 /**
- * Página de administración de usuarios
- * Permite crear, editar, eliminar y listar usuarios
+ * User administration page
+ * Allows creating, editing, deleting, and listing users
  */
 const Users = () => {
   const {
@@ -42,7 +42,7 @@ const Users = () => {
   }, [fetchUsers]);
 
   /**
-   * Maneja el envío del formulario (crear/editar usuario)
+   * Handles form submission (create/edit user)
    */
   const onSubmit = async (data) => {
     try {
@@ -63,12 +63,12 @@ const Users = () => {
       setSuccess(editingUser ? MESSAGES.SUCCESS.UPDATE : MESSAGES.SUCCESS.CREATE);
       setTimeout(() => setSuccess(''), 3000);
     } catch {
-      // Error es manejado por useApi hook
+      // Error is handled by useApi hook
     }
   };
 
   /**
-   * Prepara el formulario para editar un usuario
+   * Prepares the form to edit a user
    */
   const handleEdit = (user) => {
     setEditingUser(user);
@@ -83,7 +83,7 @@ const Users = () => {
   };
 
   /**
-   * Maneja la eliminación de un usuario con confirmación
+   * Handles user deletion with confirmation
    */
   const handleDelete = async (user) => {
     const confirmed = await confirm({
@@ -105,7 +105,7 @@ const Users = () => {
         setSuccess(MESSAGES.SUCCESS.DELETE);
         setTimeout(() => setSuccess(''), 3000);
       } catch {
-        // Error es manejado por useApi hook
+        // Error is handled by useApi hook
       }
     }
   };
@@ -128,7 +128,7 @@ const Users = () => {
   };
 
   /**
-   * Configuración de columnas para la tabla
+   * Column configuration for the table
    */
   const columns = [
     {
