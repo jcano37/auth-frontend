@@ -92,6 +92,12 @@ const Layout = ({ children }) => {
         icon: '🌐',
         description: 'System active sessions'
       },
+      { 
+        name: 'Integrations', 
+        href: ROUTES.ADMIN.INTEGRATIONS, 
+        icon: '🔌',
+        description: 'External system integrations'
+      },
       // Companies management only for root users
       ...(user?.is_superuser && user?.company_id === 1 ? [
         {

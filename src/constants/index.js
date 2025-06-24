@@ -27,6 +27,7 @@ export const ROUTES = {
     SESSIONS: '/admin/sessions',
     RESOURCES: '/admin/resources',
     COMPANIES: '/admin/companies',
+    INTEGRATIONS: '/admin/integrations',
   },
 };
 
@@ -42,6 +43,7 @@ export const MESSAGES = {
     DELETE: 'Deleted successfully',
     PASSWORD_RESET_REQUEST: 'Password reset email sent',
     PASSWORD_RESET: 'Password reset successfully',
+    REGENERATE_SECRET: 'API secret regenerated successfully',
   },
   ERROR: {
     LOGIN: 'Login failed',
@@ -60,6 +62,7 @@ export const MESSAGES = {
   CONFIRM: {
     DELETE: 'Are you sure you want to delete this item?',
     LOGOUT: 'Are you sure you want to logout?',
+    REGENERATE_SECRET: 'Are you sure you want to regenerate the API secret? This will invalidate the current secret.',
   },
   INFO: {
     LOADING: 'Loading...',
@@ -96,6 +99,16 @@ export const STATUS = {
   VERIFIED: 'verified',
   UNVERIFIED: 'unverified',
   SUSPENDED: 'suspended',
+};
+
+/**
+ * Integration types
+ */
+export const INTEGRATION_TYPES = {
+  API_KEY: 'api_key',
+  OAUTH2: 'oauth2',
+  WEBHOOK: 'webhook',
+  CUSTOM: 'custom',
 };
 
 /**
