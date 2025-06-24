@@ -2,9 +2,9 @@ import { useState, useCallback } from 'react';
 import { MESSAGES } from '../constants';
 
 /**
- * Hook personalizado para manejar llamadas a la API
+ * Custom hook to handle API calls
  * Provides loading state, errors, and execution function
- * @returns {Object} Estado y funciones para manejar API calls
+ * @returns {Object} State and functions to handle API calls
  */
 export const useApi = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +12,7 @@ export const useApi = () => {
 
   /**
    * Executes an API call with state management
-   * @param {Function} apiCall - Función que realiza la llamada a la API
+   * @param {Function} apiCall - Function that performs the API call
    * @param {Object} options - Configuration options
    * @param {Function} options.onSuccess - Callback executed on success
    * @param {Function} options.onError - Callback executed on error
@@ -76,9 +76,9 @@ export const useApi = () => {
 
 /**
  * Custom hook to handle API data lists
- * Proporciona funciones CRUD básicas para listas
+ * Provides basic CRUD functions for lists
  * @param {Array} initialData - Initial list data
- * @returns {Object} Estado y funciones para manejar listas
+ * @returns {Object} State and functions to handle lists
  */
 export const useApiList = (initialData = []) => {
   const [data, setData] = useState(initialData);
@@ -87,7 +87,7 @@ export const useApiList = (initialData = []) => {
 
   /**
    * Fetches data from the API and updates the state
-   * @param {Function} apiCall - Función que realiza la llamada a la API
+   * @param {Function} apiCall - Function that performs the API call
    * @param {Object} options - Configuration options
    * @param {string} options.errorMessage - Custom error message
    * @param {Function} options.onSuccess - Callback executed on success
@@ -179,4 +179,4 @@ export const useApiList = (initialData = []) => {
     setData: replaceData,
     clearData,
   };
-}; 
+};

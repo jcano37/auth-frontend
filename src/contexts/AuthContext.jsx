@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
   const isInitializing = useRef(false);
 
   /**
-   * Inicializa la autenticación verificando tokens existentes
+   * Initialize authentication by verifying existing tokens
    */
   useEffect(() => {
     // Prevent multiple initialization attempts
@@ -184,7 +184,7 @@ export const AuthProvider = ({ children }) => {
   }, []); // Only run once
 
   /**
-   * Función para iniciar sesión
+   * Function to login user
    * @param {Object} credentials - User credentials
    */
   const login = useCallback(async (credentials) => {
@@ -223,7 +223,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Función para cerrar sesión
+   * Function to logout
    */
   const logout = useCallback(async () => {
     try {
@@ -232,7 +232,7 @@ export const AuthProvider = ({ children }) => {
       // Continue with local logout even if server fails
       console.warn('Server logout failed:', error);
     } finally {
-      // Limpiar almacenamiento local y estado
+      // Clear local storage and state
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       dispatch({ type: 'LOGOUT' });
@@ -240,50 +240,50 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Function to register a new user
+   * Function to register a new user (DEPRECATED - Registration now handled by admin)
    * @param {Object} userData - User data
    */
-  const register = useCallback(async (userData) => {
-    dispatch({ type: 'LOGIN_START' });
-    try {
-      const response = await authService.register(userData);
-      
-      // Si el registro incluye login automático
-      if (response.access_token) {
-        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token);
-        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token);
-        
-        const user = await authService.getCurrentUser();
-        
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: {
-            user,
-            token: response.access_token,
-            refreshToken: response.refresh_token,
-          },
-        });
-      } else {
-        dispatch({ type: 'SET_LOADING', payload: false });
-      }
-      
-      return response;
-    } catch (error) {
-      const errorMessage = error.response?.data?.detail || 
-                          error.message || 
-                          MESSAGES.ERROR.REGISTER;
-      
-      dispatch({
-        type: 'LOGIN_FAILURE',
-        payload: errorMessage,
-      });
-      throw error;
-    }
-  }, []);
+  // const register = useCallback(async (userData) => {
+  //   dispatch({ type: 'LOGIN_START' });
+  //   try {
+  //     const response = await authService.register(userData);
+  //     
+  //     // If registration includes automatic login
+  //     if (response.access_token) {
+  //       localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token);
+  //       localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token);
+  //       
+  //       const user = await authService.getCurrentUser();
+  //       
+  //       dispatch({
+  //         type: 'LOGIN_SUCCESS',
+  //         payload: {
+  //           user,
+  //           token: response.access_token,
+  //           refreshToken: response.refresh_token,
+  //         },
+  //       });
+  //     } else {
+  //       dispatch({ type: 'SET_LOADING', payload: false });
+  //     }
+  //     
+  //     return response;
+  //   } catch (error) {
+  //     const errorMessage = error.response?.data?.detail || 
+  //                         error.message || 
+  //                         MESSAGES.ERROR.REGISTER;
+  //     
+  //     dispatch({
+  //       type: 'LOGIN_FAILURE',
+  //       payload: errorMessage,
+  //     });
+  //     throw error;
+  //   }
+  // }, []);
 
   /**
    * Function to update user data
-   * @param {Object} userData - Datos actualizados
+   * @param {Object} userData - Updated user data
    */
   const updateUser = useCallback(async (userData) => {
     try {
@@ -318,10 +318,9 @@ export const AuthProvider = ({ children }) => {
     ...state,
     login,
     logout,
-    register,
     updateUser,
     clearError,
-  }), [state, login, logout, register, updateUser, clearError]);
+  }), [state, login, logout, updateUser, clearError]);
 
   return (
     <AuthContext.Provider value={contextValue}>
@@ -331,8 +330,8 @@ export const AuthProvider = ({ children }) => {
 };
 
 /**
- * Hook para usar el contexto de autenticación
- * @returns {Object} Estado y funciones de autenticación
+ * Hook to use the authentication context
+ * @returns {Object} Authentication state and functions
  */
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -340,4 +339,4 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}; 
+};

@@ -1,15 +1,15 @@
 import React from 'react';
 
 /**
- * Componente de alerta reutilizable
- * Muestra mensajes de diferentes tipos con estilos consistentes
- * @param {Object} props - Propiedades del componente
- * @param {string} props.type - Tipo de alerta ('success', 'error', 'warning', 'info')
- * @param {string} props.message - Mensaje a mostrar
- * @param {boolean} props.dismissible - Si la alerta puede ser cerrada
- * @param {Function} props.onClose - Función ejecutada al cerrar la alerta
- * @param {string} props.className - Clases CSS adicionales
- * @param {React.ReactNode} props.children - Contenido personalizado
+ * Reusable alert component
+ * Shows messages of different types with consistent styles
+ * @param {Object} props - Component properties
+ * @param {string} props.type - Alert type ('success', 'error', 'warning', 'info')
+ * @param {string} props.message - Message to display
+ * @param {boolean} props.dismissible - If the alert can be dismissed
+ * @param {Function} props.onClose - Function executed on alert close
+ * @param {string} props.className - Additional CSS classes
+ * @param {React.ReactNode} props.children - Custom content
  */
 const Alert = ({ 
   type = 'info', 
@@ -19,11 +19,11 @@ const Alert = ({
   className = '',
   children 
 }) => {
-  // No renderizar si no hay mensaje ni children
+  // Don't render if there's no message or children
   if (!message && !children) return null;
 
   /**
-   * Configuración de estilos por tipo de alerta
+   * Style configuration by alert type
    */
   const alertStyles = {
     success: {
@@ -51,7 +51,7 @@ const Alert = ({
   const currentStyle = alertStyles[type] || alertStyles.info;
 
   /**
-   * Maneja el cierre de la alerta
+   * Handles alert closing
    */
   const handleClose = () => {
     if (onClose) {
@@ -70,7 +70,7 @@ const Alert = ({
       aria-live="polite"
     >
       <div className="flex items-start">
-        {/* Icono */}
+        {/* Icon */}
         <div className="flex-shrink-0">
           <span 
             className={`text-lg ${currentStyle.iconColor}`}
@@ -80,7 +80,7 @@ const Alert = ({
           </span>
         </div>
 
-        {/* Contenido */}
+        {/* Content */}
         <div className="ml-3 flex-1">
           {message && (
             <p className="text-sm font-medium">
@@ -94,7 +94,7 @@ const Alert = ({
           )}
         </div>
 
-        {/* Botón de cierre */}
+        {/* Close button */}
         {dismissible && (
           <div className="ml-auto pl-3">
             <button
@@ -131,4 +131,4 @@ const Alert = ({
   );
 };
 
-export default Alert; 
+export default Alert;

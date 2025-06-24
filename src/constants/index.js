@@ -1,5 +1,5 @@
 /**
- * Configuración de la API
+ * API Configuration
  */
 export const API_CONFIG = {
   BASE_URL: 'http://localhost:8000/api/v1',
@@ -7,47 +7,47 @@ export const API_CONFIG = {
 };
 
 /**
- * Rutas de la aplicación
+ * Application Routes
  */
 export const ROUTES = {
-  // Rutas públicas
+  // Public routes
   LOGIN: '/login',
-  REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
   
-  // Rutas protegidas
+  // Protected routes
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',
   MY_SESSIONS: '/my-sessions',
   
-  // Rutas de administración
+  // Administration routes
   ADMIN: {
     USERS: '/admin/users',
     ROLES: '/admin/roles',
     PERMISSIONS: '/admin/permissions',
     SESSIONS: '/admin/sessions',
     RESOURCES: '/admin/resources',
+    COMPANIES: '/admin/companies',
+    INTEGRATIONS: '/admin/integrations',
   },
 };
 
 /**
- * Mensajes de la aplicación
+ * Application messages
  */
 export const MESSAGES = {
   SUCCESS: {
     LOGIN: 'Login successful',
     LOGOUT: 'Logged out successfully',
-    REGISTER: 'Registration successful',
     UPDATE: 'Updated successfully',
     CREATE: 'Created successfully',
     DELETE: 'Deleted successfully',
     PASSWORD_RESET_REQUEST: 'Password reset email sent',
     PASSWORD_RESET: 'Password reset successfully',
+    REGENERATE_SECRET: 'API secret regenerated successfully',
   },
   ERROR: {
     LOGIN: 'Login failed',
     LOGOUT: 'Logout failed',
-    REGISTER: 'Registration failed',
     UPDATE: 'Update failed',
     CREATE: 'Creation failed',
     DELETE: 'Deletion failed',
@@ -62,6 +62,7 @@ export const MESSAGES = {
   CONFIRM: {
     DELETE: 'Are you sure you want to delete this item?',
     LOGOUT: 'Are you sure you want to logout?',
+    REGENERATE_SECRET: 'Are you sure you want to regenerate the API secret? This will invalidate the current secret.',
   },
   INFO: {
     LOADING: 'Loading...',
@@ -71,7 +72,7 @@ export const MESSAGES = {
 };
 
 /**
- * Configuración de paginación
+ * Pagination configuration
  */
 export const PAGINATION = {
   DEFAULT_PAGE_SIZE: 10,
@@ -101,7 +102,17 @@ export const STATUS = {
 };
 
 /**
- * Reglas de validación de formularios
+ * Integration types
+ */
+export const INTEGRATION_TYPES = {
+  API_KEY: 'api_key',
+  OAUTH2: 'oauth2',
+  WEBHOOK: 'webhook',
+  CUSTOM: 'custom',
+};
+
+/**
+ * Form validation rules
  */
 export const VALIDATION = {
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -111,7 +122,7 @@ export const VALIDATION = {
   USERNAME_MAX_LENGTH: 50,
   FULL_NAME_MAX_LENGTH: 100,
   
-  // Mensajes de validación
+  // Validation messages
   MESSAGES: {
     REQUIRED: 'This field is required',
     EMAIL_INVALID: 'Please enter a valid email address',
@@ -122,7 +133,7 @@ export const VALIDATION = {
 };
 
 /**
- * Claves de almacenamiento local
+ * Local storage keys
  */
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
@@ -132,18 +143,18 @@ export const STORAGE_KEYS = {
 };
 
 /**
- * Configuración de UI
+ * UI Configuration
  */
 export const UI_CONFIG = {
   DEBOUNCE_DELAY: 300,
   TOAST_DURATION: 3000,
   MODAL_ANIMATION_DURATION: 200,
   
-  // Breakpoints (coinciden con Tailwind CSS)
+  // Breakpoints (match Tailwind CSS)
   BREAKPOINTS: {
     SM: 640,
     MD: 768,
     LG: 1024,
     XL: 1280,
   },
-}; 
+};

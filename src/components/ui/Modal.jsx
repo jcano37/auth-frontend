@@ -1,14 +1,14 @@
 import React, { useEffect, useCallback } from 'react';
 
 /**
- * Componente Modal reutilizable
- * @param {Object} props - Propiedades del componente
- * @param {boolean} props.isOpen - Si el modal está abierto
- * @param {Function} props.onClose - Función ejecutada al cerrar
- * @param {string} props.title - Título del modal
- * @param {React.ReactNode} props.children - Contenido del modal
- * @param {string} props.size - Tamaño del modal ('sm', 'md', 'lg', 'xl')
- * @param {boolean} props.showCloseButton - Si mostrar el botón de cierre
+ * Reusable Modal component
+ * @param {Object} props - Component properties
+ * @param {boolean} props.isOpen - If the modal is open
+ * @param {Function} props.onClose - Function executed on close
+ * @param {string} props.title - Modal title
+ * @param {React.ReactNode} props.children - Modal content
+ * @param {string} props.size - Modal size ('sm', 'md', 'lg', 'xl')
+ * @param {boolean} props.showCloseButton - Whether to show the close button
  */
 const Modal = ({ 
   isOpen, 
@@ -26,7 +26,7 @@ const Modal = ({
   };
 
   /**
-   * Maneja el clic en el overlay para cerrar el modal
+   * Handles click on overlay to close modal
    */
   const handleOverlayClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
@@ -35,7 +35,7 @@ const Modal = ({
   }, [onClose]);
 
   /**
-   * Maneja el escape key para cerrar el modal
+   * Handles escape key to close modal
    */
   const handleEscape = useCallback((e) => {
     if (e.key === 'Escape') {
@@ -46,7 +46,7 @@ const Modal = ({
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      // Prevenir scroll del body cuando el modal está abierto
+      // Prevent body scroll when modal is open
       document.body.style.overflow = 'hidden';
     }
 
@@ -101,4 +101,4 @@ const Modal = ({
   );
 };
 
-export default Modal; 
+export default Modal;

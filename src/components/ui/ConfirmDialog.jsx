@@ -2,17 +2,17 @@ import React, { useCallback } from 'react';
 import Modal from './Modal';
 
 /**
- * Componente de diálogo de confirmación
- * @param {Object} props - Propiedades del componente
- * @param {boolean} props.isOpen - Si el diálogo está abierto
- * @param {Function} props.onClose - Función ejecutada al cerrar
- * @param {Function} props.onConfirm - Función ejecutada al confirmar
- * @param {string} props.title - Título del diálogo
- * @param {string} props.message - Mensaje de confirmación
- * @param {string} props.confirmText - Texto del botón de confirmación
- * @param {string} props.cancelText - Texto del botón de cancelar
- * @param {string} props.type - Tipo de confirmación ('danger', 'warning', 'info')
- * @param {React.ReactNode} props.icon - Icono personalizado
+ * Confirmation dialog component
+ * @param {Object} props - Component properties
+ * @param {boolean} props.isOpen - If the dialog is open
+ * @param {Function} props.onClose - Function executed on close
+ * @param {Function} props.onConfirm - Function executed on confirm
+ * @param {string} props.title - Dialog title
+ * @param {string} props.message - Confirmation message
+ * @param {string} props.confirmText - Confirmation button text
+ * @param {string} props.cancelText - Cancel button text
+ * @param {string} props.type - Confirmation type ('danger', 'warning', 'info')
+ * @param {React.ReactNode} props.icon - Custom icon
  */
 const ConfirmDialog = ({
   isOpen,
@@ -26,7 +26,7 @@ const ConfirmDialog = ({
   icon
 }) => {
   /**
-   * Configuración de estilos por tipo
+   * Style configuration by type
    */
   const typeConfig = {
     danger: {
@@ -55,7 +55,7 @@ const ConfirmDialog = ({
   const config = typeConfig[type] || typeConfig.warning;
 
   /**
-   * Maneja la confirmación
+   * Handles confirmation
    */
   const handleConfirm = useCallback(() => {
     onConfirm();
@@ -63,7 +63,7 @@ const ConfirmDialog = ({
   }, [onConfirm, onClose]);
 
   /**
-   * Maneja la cancelación
+   * Handles cancellation
    */
   const handleCancel = useCallback(() => {
     onClose();
@@ -91,12 +91,12 @@ const ConfirmDialog = ({
           {title}
         </h3>
 
-        {/* Mensaje */}
+        {/* Message */}
         <p className="text-sm text-gray-500 mb-6">
           {message}
         </p>
 
-        {/* Botones */}
+        {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 sm:justify-center">
           <button
             type="button"
@@ -118,4 +118,4 @@ const ConfirmDialog = ({
   );
 };
 
-export default ConfirmDialog; 
+export default ConfirmDialog;

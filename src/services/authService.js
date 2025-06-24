@@ -64,7 +64,7 @@ api.interceptors.response.use(
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
         
         // Only redirect if we're not on public pages or specific requests
-        const isPublicPage = ['/login', '/register', '/forgot-password'].some(path => 
+        const isPublicPage = ['/login', '/forgot-password'].some(path => 
           window.location.pathname.includes(path)
         );
         const isAuthContextRequest = originalRequest.url.includes('/users/me');
@@ -106,14 +106,14 @@ export const login = async (credentials) => {
 };
 
 /**
- * Register new user
+ * Register new user (DEPRECATED - Only used by admin endpoints now)
  * @param {Object} userData - User data
  * @returns {Promise<Object>} Registration response
  */
-export const register = async (userData) => {
-  const response = await api.post('/auth/register', userData);
-  return response.data;
-};
+// export const register = async (userData) => {
+//   const response = await api.post('/auth/register', userData);
+//   return response.data;
+// };
 
 /**
  * Log out current user
@@ -294,7 +294,9 @@ export const deleteRole = async (roleId) => {
  * @returns {Promise<Object>} Assignment response
  */
 export const assignPermissionToRole = async (roleId, permissionId) => {
-  const response = await api.post(`/roles/${roleId}/permissions/${permissionId}`);
+  const response = await api.post(`/roles/${roleId}/permissions`, {
+    permission_id: permissionId,
+  });
   return response.data;
 };
 
@@ -363,10 +365,10 @@ export const deletePermission = async (permissionId) => {
   return response.data;
 };
 
-// ==================== RESOURCE TYPE ENDPOINTS ====================
+// ==================== RESOURCE ENDPOINTS ====================
 
 /**
- * Get all resource types
+ * Get list of resource types
  * @param {number} skip - Number of records to skip
  * @param {number} limit - Record limit
  * @returns {Promise<Array>} List of resource types
@@ -379,8 +381,8 @@ export const getResourceTypes = async (skip = 0, limit = 100) => {
 // ==================== SESSION ENDPOINTS ====================
 
 /**
- * Get all sessions for the current user
- * @returns {Promise<Array>} List of active sessions
+ * Get current user sessions
+ * @returns {Promise<Array>} List of sessions
  */
 export const getCurrentUserSessions = async () => {
   const response = await api.get('/users/me/sessions');
@@ -388,7 +390,7 @@ export const getCurrentUserSessions = async () => {
 };
 
 /**
- * Revoke a specific session
+ * Revoke specific session
  * @param {number} sessionId - Session ID
  * @returns {Promise<Object>} Revocation response
  */
@@ -398,7 +400,7 @@ export const revokeSession = async (sessionId) => {
 };
 
 /**
- * Revoke all sessions except the current one
+ * Revoke all sessions except current
  * @returns {Promise<Object>} Revocation response
  */
 export const revokeAllSessions = async () => {
@@ -406,9 +408,11 @@ export const revokeAllSessions = async () => {
   return response.data;
 };
 
+// ==================== ADMIN ENDPOINTS ====================
+
 /**
- * Get active users statistics (admin)
- * @returns {Promise<Object>} Active users statistics
+ * Get active users statistics
+ * @returns {Promise<Object>} Stats data
  */
 export const getActiveUsersStats = async () => {
   const response = await api.get('/users/active-stats');
@@ -419,7 +423,7 @@ export const getActiveUsersStats = async () => {
  * Get all active sessions (admin)
  * @param {number} skip - Number of records to skip
  * @param {number} limit - Record limit
- * @returns {Promise<Array>} List of active sessions
+ * @returns {Promise<Array>} List of sessions
  */
 export const getActiveSessions = async (skip = 0, limit = 100) => {
   const response = await api.get(`/users/active-sessions?skip=${skip}&limit=${limit}`);
@@ -427,12 +431,130 @@ export const getActiveSessions = async (skip = 0, limit = 100) => {
 };
 
 /**
- * Revoke any session (admin)
+ * Admin revoke session
  * @param {number} sessionId - Session ID
  * @returns {Promise<Object>} Revocation response
  */
 export const adminRevokeSession = async (sessionId) => {
   const response = await api.delete(`/users/sessions/${sessionId}`);
+  return response.data;
+};
+
+// ==================== COMPANY ENDPOINTS ====================
+
+/**
+ * Get list of companies
+ * @param {number} skip - Number of records to skip
+ * @param {number} limit - Record limit
+ * @returns {Promise<Array>} List of companies
+ */
+export const getCompanies = async (skip = 0, limit = 100) => {
+  const response = await api.get(`/companies/?skip=${skip}&limit=${limit}`);
+  return response.data;
+};
+
+/**
+ * Get company by ID
+ * @param {number} companyId - Company ID
+ * @returns {Promise<Object>} Company data
+ */
+export const getCompanyById = async (companyId) => {
+  const response = await api.get(`/companies/${companyId}`);
+  return response.data;
+};
+
+/**
+ * Create new company
+ * @param {Object} companyData - Company data
+ * @returns {Promise<Object>} Created company
+ */
+export const createCompany = async (companyData) => {
+  const response = await api.post('/companies/', companyData);
+  return response.data;
+};
+
+/**
+ * Update company by ID
+ * @param {number} companyId - Company ID
+ * @param {Object} companyData - Data to update
+ * @returns {Promise<Object>} Updated company
+ */
+export const updateCompany = async (companyId, companyData) => {
+  const response = await api.put(`/companies/${companyId}`, companyData);
+  return response.data;
+};
+
+/**
+ * Delete company by ID
+ * @param {number} companyId - Company ID
+ * @returns {Promise<Object>} Deletion response
+ */
+export const deleteCompany = async (companyId) => {
+  const response = await api.delete(`/companies/${companyId}`);
+  return response.data;
+};
+
+// ==================== INTEGRATION ENDPOINTS ====================
+
+/**
+ * Get list of integrations
+ * @param {number} skip - Number of records to skip
+ * @param {number} limit - Record limit
+ * @returns {Promise<Array>} List of integrations
+ */
+export const getIntegrations = async (skip = 0, limit = 100) => {
+  const response = await api.get(`/integrations/?skip=${skip}&limit=${limit}`);
+  return response.data;
+};
+
+/**
+ * Get integration by ID
+ * @param {number} integrationId - Integration ID
+ * @returns {Promise<Object>} Integration data
+ */
+export const getIntegrationById = async (integrationId) => {
+  const response = await api.get(`/integrations/${integrationId}`);
+  return response.data;
+};
+
+/**
+ * Create new integration
+ * @param {Object} integrationData - Integration data
+ * @returns {Promise<Object>} Created integration
+ */
+export const createIntegration = async (integrationData) => {
+  const response = await api.post('/integrations/', integrationData);
+  return response.data;
+};
+
+/**
+ * Update integration by ID
+ * @param {number} integrationId - Integration ID
+ * @param {Object} integrationData - Data to update
+ * @returns {Promise<Object>} Updated integration
+ */
+export const updateIntegration = async (integrationId, integrationData) => {
+  const response = await api.put(`/integrations/${integrationId}`, integrationData);
+  return response.data;
+};
+
+/**
+ * Delete integration by ID
+ * @param {number} integrationId - Integration ID
+ * @returns {Promise<Object>} Deletion response
+ */
+export const deleteIntegration = async (integrationId) => {
+  const response = await api.delete(`/integrations/${integrationId}`);
+  return response.data;
+};
+
+/**
+ * Regenerate API secret for integration
+ * @param {number} integrationId - Integration ID
+ * @returns {Promise<Object>} Updated integration with new secret
+ */
+export const regenerateApiSecret = async (integrationId) => {
+  const response = await api.post(`/integrations/${integrationId}/regenerate-secret`);
   return response.data;
 };
 

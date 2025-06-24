@@ -6,7 +6,6 @@ import SuspenseFallback from './components/SuspenseFallback';
 
 // Pages
 import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import ForgotPassword from './pages/ForgotPassword';
@@ -17,6 +16,8 @@ const Users = React.lazy(() => import('./pages/admin/Users'));
 const Roles = React.lazy(() => import('./pages/admin/Roles'));
 const Permissions = React.lazy(() => import('./pages/admin/Permissions'));
 const Sessions = React.lazy(() => import('./pages/admin/Sessions'));
+const Companies = React.lazy(() => import('./pages/admin/Companies'));
+const Integrations = React.lazy(() => import('./pages/admin/Integrations'));
 
 function App() {
   return (
@@ -26,7 +27,6 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             
             {/* Protected routes */}
@@ -92,6 +92,26 @@ function App() {
                 <ProtectedRoute requireAdmin={true}>
                   <Suspense fallback={<SuspenseFallback />}>
                     <Sessions />
+                  </Suspense>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/integrations" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <Suspense fallback={<SuspenseFallback />}>
+                    <Integrations />
+                  </Suspense>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/companies" 
+              element={
+                <ProtectedRoute requireAdmin={true} requireRoot={true}>
+                  <Suspense fallback={<SuspenseFallback />}>
+                    <Companies />
                   </Suspense>
                 </ProtectedRoute>
               } 
