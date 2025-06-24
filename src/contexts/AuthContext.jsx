@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
   const isInitializing = useRef(false);
 
   /**
-   * Inicializa la autenticación verificando tokens existentes
+   * Initialize authentication by verifying existing tokens
    */
   useEffect(() => {
     // Prevent multiple initialization attempts
@@ -184,7 +184,7 @@ export const AuthProvider = ({ children }) => {
   }, []); // Only run once
 
   /**
-   * Función para iniciar sesión
+   * Function to login user
    * @param {Object} credentials - User credentials
    */
   const login = useCallback(async (credentials) => {
@@ -232,7 +232,7 @@ export const AuthProvider = ({ children }) => {
       // Continue with local logout even if server fails
       console.warn('Server logout failed:', error);
     } finally {
-      // Limpiar almacenamiento local y estado
+      // Clear local storage and state
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       dispatch({ type: 'LOGOUT' });
@@ -283,7 +283,7 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * Function to update user data
-   * @param {Object} userData - Datos actualizados
+   * @param {Object} userData - Updated user data
    */
   const updateUser = useCallback(async (userData) => {
     try {
@@ -330,7 +330,7 @@ export const AuthProvider = ({ children }) => {
 };
 
 /**
- * Hook para usar el contexto de autenticación
+ * Hook to use the authentication context
  * @returns {Object} Authentication state and functions
  */
 export const useAuth = () => {

@@ -1,8 +1,8 @@
 import React from 'react';
 
 /**
- * Componente de logo de la empresa
- * Muestra el logo de Vite con el nombre de la empresa de forma profesional
+ * Company logo component
+ * Displays the Vite logo with the company name in a professional way
  */
 const Logo = ({ size = 'md', showText = true, className = '' }) => {
   const sizeClasses = {
@@ -21,7 +21,7 @@ const Logo = ({ size = 'md', showText = true, className = '' }) => {
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
-      {/* Logo de Vite */}
+      {/* Vite Logo */}
       <div className="flex-shrink-0">
         <img
           src="/vite.svg"
@@ -30,7 +30,7 @@ const Logo = ({ size = 'md', showText = true, className = '' }) => {
         />
       </div>
       
-      {/* Nombre de la empresa */}
+      {/* Company Name */}
       {showText && (
         <div className="flex flex-col">
           <h1 className={`${textSizeClasses[size]} font-bold text-gray-900 leading-tight`}>

@@ -114,7 +114,7 @@ const MySessions = () => {
   };
 
   /**
-   * Determina si una sesión es la actual
+   * Determines if a session is the current one
    */
   const isCurrentSession = (session) => {
     // This is an approximation - in a real implementation you could

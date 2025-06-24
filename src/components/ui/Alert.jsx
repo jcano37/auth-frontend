@@ -23,7 +23,7 @@ const Alert = ({
   if (!message && !children) return null;
 
   /**
-   * Configuración de estilos por tipo de alerta
+   * Style configuration by alert type
    */
   const alertStyles = {
     success: {
@@ -51,7 +51,7 @@ const Alert = ({
   const currentStyle = alertStyles[type] || alertStyles.info;
 
   /**
-   * Maneja el cierre de la alerta
+   * Handles alert closing
    */
   const handleClose = () => {
     if (onClose) {
@@ -70,7 +70,7 @@ const Alert = ({
       aria-live="polite"
     >
       <div className="flex items-start">
-        {/* Icono */}
+        {/* Icon */}
         <div className="flex-shrink-0">
           <span 
             className={`text-lg ${currentStyle.iconColor}`}
@@ -80,7 +80,7 @@ const Alert = ({
           </span>
         </div>
 
-        {/* Contenido */}
+        {/* Content */}
         <div className="ml-3 flex-1">
           {message && (
             <p className="text-sm font-medium">
@@ -94,7 +94,7 @@ const Alert = ({
           )}
         </div>
 
-        {/* Botón de cierre */}
+        {/* Close button */}
         {dismissible && (
           <div className="ml-auto pl-3">
             <button

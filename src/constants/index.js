@@ -1,5 +1,5 @@
 /**
- * Configuración de la API
+ * API Configuration
  */
 export const API_CONFIG = {
   BASE_URL: 'http://localhost:8000/api/v1',
@@ -7,14 +7,14 @@ export const API_CONFIG = {
 };
 
 /**
- * Rutas de la aplicación
+ * Application Routes
  */
 export const ROUTES = {
   // Public routes
   LOGIN: '/login',
   FORGOT_PASSWORD: '/forgot-password',
   
-  // Rutas protegidas
+  // Protected routes
   DASHBOARD: '/dashboard',
   PROFILE: '/profile',
   MY_SESSIONS: '/my-sessions',
@@ -112,7 +112,7 @@ export const INTEGRATION_TYPES = {
 };
 
 /**
- * Reglas de validación de formularios
+ * Form validation rules
  */
 export const VALIDATION = {
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -133,7 +133,7 @@ export const VALIDATION = {
 };
 
 /**
- * Claves de almacenamiento local
+ * Local storage keys
  */
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
@@ -143,14 +143,14 @@ export const STORAGE_KEYS = {
 };
 
 /**
- * Configuración de UI
+ * UI Configuration
  */
 export const UI_CONFIG = {
   DEBOUNCE_DELAY: 300,
   TOAST_DURATION: 3000,
   MODAL_ANIMATION_DURATION: 200,
   
-  // Breakpoints (coinciden con Tailwind CSS)
+  // Breakpoints (match Tailwind CSS)
   BREAKPOINTS: {
     SM: 640,
     MD: 768,
